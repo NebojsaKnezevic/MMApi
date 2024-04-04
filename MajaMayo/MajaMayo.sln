@@ -5,6 +5,10 @@ VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "MajaMayo.DB", "MajaMayo.DB\MajaMayo.DB.sqlproj", "{F84E54B6-77B6-4C7B-9B4F-58530CDF1FBA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web", "web", "{A4FB6A37-A8BF-4EAD-A7D6-2507489A9E07}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{7D567D11-9E87-4ADC-86EE-64A812E358EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +24,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F84E54B6-77B6-4C7B-9B4F-58530CDF1FBA} = {7D567D11-9E87-4ADC-86EE-64A812E358EC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {46FE3101-4026-4262-BAAF-C4495AAFCBAE}
