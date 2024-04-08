@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{f84e54b6-77b6-4c7b-9b4f-58530cdf1fba}</ProjectGuid>
-    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql150DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
@@ -62,6 +62,15 @@
     <Folder Include="Tables\dbo" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Tables\dbo\Questions.sql" />
+    <Build Include="Tables\dbo\Question.sql" />
+    <Build Include="Tables\dbo\QuestionGroup.sql" />
+    <Build Include="Tables\dbo\QuestionSubgroup.sql" />
+    <Build Include="Tables\dbo\User.sql" />
+    <Build Include="Tables\dbo\HealthAssesment.sql" />
+    <Build Include="Tables\dbo\Answer.sql" />
+    <Build Include="Tables\dbo\HealthAssesmentAnswers.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DEV.publish.xml" />
   </ItemGroup>
 </Project>
