@@ -64,11 +64,12 @@
   <ItemGroup>
     <Build Include="Tables\dbo\Question.sql" />
     <Build Include="Tables\dbo\QuestionGroup.sql" />
-    <Build Include="Tables\dbo\QuestionSubgroup.sql" />
     <Build Include="Tables\dbo\User.sql" />
     <Build Include="Tables\dbo\HealthAssesment.sql" />
     <Build Include="Tables\dbo\Answer.sql" />
     <Build Include="Tables\dbo\HealthAssesmentAnswers.sql" />
+    <Build Include="Tables\dbo\Picture.sql" />
+    <Build Include="Procedures\dbo\LoadTestData.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DEV.publish.xml" />

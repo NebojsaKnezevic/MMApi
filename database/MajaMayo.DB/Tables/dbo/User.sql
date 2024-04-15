@@ -6,8 +6,12 @@
 	[Email] nvarchar(100) not null,
 	[PhoneNumber] nvarchar(100) not null,
 	[DateOfBirth] date not null,
+	[Gender] nvarchar(100) not null, -- constraint values
+	[Password] nvarchar(100) not null, --hashirano proveri lenght
 	[RegisteredOn] datetime not null,
-	--insurance policy number?
+	[PolicyNumber] nvarchar(100) null,
+	[JMBG] nvarchar(13) null,
+	[PassportNumber] nvarchar(20) null,
 	--email validation?
 	--phone number validation?
 		
