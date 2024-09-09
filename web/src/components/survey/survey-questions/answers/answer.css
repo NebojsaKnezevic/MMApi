@@ -1,0 +1,29 @@
+/* Base styling for checkboxes */
+.form-check-input {
+    border: 1px solid grey !important; /* Default border color */
+    border-radius: 50% !important; /* Make the border circular */
+
+    background-color: white !important; /* Default background color */
+    cursor: pointer !important; /* Change cursor to pointer */
+    appearance: none !important; /* Remove default checkbox appearance */
+    -webkit-appearance: none !important; /* Remove default checkbox appearance for WebKit browsers */
+}
+
+/* Styling for the checkbox when checked */
+.form-check-input:checked {
+    background-color: grey !important; /* Background color when checked */
+    border: 2px solid grey !important; /* Ensure border remains visible when checked */
+}
+
+/* Optional: Style the focus state */
+.form-check-input:focus {
+    outline: none !important; /* Remove default outline */
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25) !important; /* Custom focus shadow */
+}
+
+/* Optional: Style the label if needed */
+.form-check-label {
+    margin-left: 0.5em !important; /* Space between checkbox and label */
+    color: black !important; /* Label color */
+    cursor: pointer !important; /* Cursor pointer for the label */
+}

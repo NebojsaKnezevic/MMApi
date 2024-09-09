@@ -1,0 +1,64 @@
+/* .buttonIcons {
+    transition: color 0.3s ease;
+} */
+
+
+.image-container {
+    transition: transform 0.3s ease, border-left-color 0.3s ease, border-left-width 0.3s ease, margin-top 0.3s ease, margin-bottom 0.3s ease;
+    cursor: pointer;
+    cursor: pointer;
+    cursor: pointer;
+    border-left: solid 5px grey;
+    border-radius: 5px;
+    margin-bottom: 8px;
+}
+
+.image-container:hover {
+    transform: scale(1.00);
+    /* border-left-color: rgba(241,237,233,255); */
+    border-left-color: rgba(241,237,233,255);
+    /* border-left-width: 8px;  */
+    border-left-style: solid; 
+    /* margin-top: 15px; */
+}
+
+/* .buttonIcons:hover{
+    color: aquamarine;
+} */
+
+.imgParent {
+    height: 80px; 
+    width: 90px;  
+    position: relative;
+    overflow: hidden; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    background-color: white;
+}
+
+.imgClass {
+    object-fit: cover; 
+}
+
+
+.shadow-transition {
+    transition: box-shadow 12s ease-in-out;
+  }
+  
+  .Question-Compartment {
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
+    
+  }
+
+
+  .fade-out {
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+  

@@ -1,16 +1,31 @@
 ﻿using Dapper;
 using MajaMayo.API.Models;
+using Microsoft.IdentityModel.Tokens;
 using System.Data;
+using System.Data.Common;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using static MajaMayo.API.Models.CommonResponseObject;
 
 namespace MajaMayo.API.Repository
 {
     public class QueryRepository : IQueryRepository
     {
         private readonly IDbConnection _context;
+        private readonly IHttpContextAccessor _httpContext;
+        private readonly IConfiguration _configuration;
 
-        public QueryRepository(IDbConnection context)
+        private List<CommonResponseObject> _response;
+        private IEnumerable<QuestionGroupResponse> _questionGroups;
+        private IEnumerable<QuestionResponse> _questions;
+        private IEnumerable<AnswerResponse> _answers;
+
+        public QueryRepository(IDbConnection context, IHttpContextAccessor httpContext, IConfiguration configuration)
         {
             _context = context;
+            _httpContext = httpContext;
+            _configuration = configuration;
         }
 
         public async Task<ICollection<QuestionResponse>> GetQuestions()
@@ -20,105 +35,30 @@ namespace MajaMayo.API.Repository
             return response.ToList();
         }
 
-        public async Task<ICollection<QuestionGroupResponse>> GetQuestionsQueryOld(string email)
+        public async Task<ICollection<QuestionGroupResponse>> GetQuestionGroups()
         {
-            var parameters = new DynamicParameters();
-            parameters.Add("@Email", email);
-
-            string sql = "EXEC dbo.spGetQuestionsQuery @Email";
-
-            var result = await _context.QueryMultipleAsync(
-                sql,
-                parameters,
-                commandType: CommandType.Text
-            );
-
-            var questionGroups = await result.ReadAsync<QuestionGroupResponse>();
-            var questions = await result.ReadAsync<QuestionResponse>();
-            var answers = await result.ReadAsync<AnswerResponse>();
-
-            //var groupedQuestions = questions.GroupBy(q => q.QuestionGroupId);
-            foreach (var questionGroup in questionGroups)
-            {
-                var questionFromSpecificGroup = questions.Where(q => q.QuestionGroupId == questionGroup.Id).ToList();
-                foreach (var question in questionFromSpecificGroup)
-                {
-                    var answersForSpecificQuestion = answers.Where(x => x.QuestionId == question.Id).ToList();
-                    question.Answers.AddRange(answersForSpecificQuestion);
-                }
-                questionGroup.Questions.AddRange(questionFromSpecificGroup);
-            }
-            return GroupQuestionGroupResponse(questionGroups.ToList());
+            var response = await _context.QueryAsync<QuestionGroupResponse>
+                ("dbo.spGetQuestionGroups2", null, commandType:CommandType.StoredProcedure);
+            return response.ToList();
         }
 
-        public async Task<ICollection<CommonResponseObject>> GetQuestionsQuery(string email)
+        public async Task<ICollection<AnswerResponse>> GetAnswers(int userId, int healthAssesmentId)
         {
-            var parameters = new DynamicParameters();
-            parameters.Add("@Email", email);
+            var pars = new DynamicParameters();
+            pars.Add("@UserId", userId, DbType.Int32);
+            pars.Add("@HealthAssessmentId", healthAssesmentId, DbType.Int32);
+            var response = await _context.QueryAsync<AnswerResponse>("dbo.spGetAnswers", pars, commandType: CommandType.StoredProcedure);
+            return response.ToList();
+        }
 
-            string sql = "EXEC dbo.spGetQuestionsQuery @Email";
+        public async Task<HealthAssesmentResponse> GetHealthAssesment(int userId, int healthAssesmentId = 0)
+        {
+            var pars = new DynamicParameters();
+            pars.Add("@UserId", userId, DbType.Int32);
+            pars.Add("@HealthAssesmentId", healthAssesmentId, DbType.Int32);
 
-            var result = await _context.QueryMultipleAsync(
-                sql,
-                parameters,
-                commandType: CommandType.Text
-            );
-
-            var questionGroups = await result.ReadAsync<QuestionGroupResponse>();
-            var questions = await result.ReadAsync<QuestionResponse>();
-            var answers = await result.ReadAsync<AnswerResponse>();
-
-            var response = new List<CommonResponseObject>();
-
-            foreach (var group in questionGroups)
-            {
-                response.Add(new CommonResponseObject 
-                { 
-                    Id = group.Id,
-                    Type = CommonResponseObject.StepType.Group.ToString(),
-                    Name = group.Name,
-                    Question = "",
-                    
-                });
-
-                foreach (var question in questions.Where(x => x.QuestionGroupId == group.Id))
-                {
-                    response.Add(new CommonResponseObject
-                    {
-                        Id = question.Id,
-                        Type = CommonResponseObject.StepType.Question.ToString(),
-                        Name = group.Name,
-                        Question = question.Text,
-                        Answers = answers.Where(x => x.QuestionId == question.Id ).Select(x => new CommonResponseObject.Answer { 
-                            Id = x.Id,
-                            Val = x.Text
-                        }).ToList(),
-                        UserAnswered = answers.Where(x => x.QuestionId == question.Id && x.HealthAssesmentId > 0).Select(x => x.Id).ToList()
-                    });
-                }
-            }
-
+            var response = await _context.QuerySingleAsync<HealthAssesmentResponse>("spGetHealthAssesment", pars, commandType: CommandType.StoredProcedure);
             return response;
-        }
-
-        private List<QuestionGroupResponse> GroupQuestionGroupResponse(List<QuestionGroupResponse> subgroups) 
-        {
-            var subgroupDictionary = subgroups.ToDictionary(x => x.Id, x => x);
-            var roots = new List<QuestionGroupResponse>();
-            foreach (var subgroup in subgroups)
-            {
-                
-                if (subgroupDictionary.ContainsKey(subgroup.ParentId))
-                {
-                    var parentSubgroup = subgroupDictionary[subgroup.ParentId];
-                    parentSubgroup.Subgroups.Add(subgroup);
-                }
-                else 
-                {
-                    roots.Add(subgroup);
-                }
-            }
-            return roots;
         }
     }
 }

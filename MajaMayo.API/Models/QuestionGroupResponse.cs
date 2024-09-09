@@ -15,6 +15,7 @@
         public List<QuestionResponse>? Questions { get; set; }
 
         public List<QuestionGroupResponse>? Subgroups { get; set; }
+        public string Url { get; set; }
 
         public QuestionGroupResponse()
         {

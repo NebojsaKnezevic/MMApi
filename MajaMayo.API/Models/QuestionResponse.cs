@@ -15,6 +15,8 @@
         //public DateTime CreatedOn { get; set; }
         public int? Image { get; set; }
         public List<AnswerResponse>? Answers { get; set; }
+        public bool IsMultipleSelect { get; set; }
+        public int MaxSelect { get; set; }
 
         public QuestionResponse()
         {
