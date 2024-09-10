@@ -19,6 +19,7 @@ import Endokrini from '../../assets/question-groups/Endokrini.jpg'
 import { Colors } from '../../constants/constants';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Grid, IconButton, Typography } from '@mui/material';
 import { ExpandLess, ExpandMore, Margin, Widgets } from '@mui/icons-material';
+import { IAnswer } from './survey-questions/answers/answer';
 // import Pluca from '../../assets/question-groups/Pluca.avif'
 
 
@@ -54,7 +55,19 @@ export interface IQuestionGroupProps {
 export const QuestionGroups: React.FunctionComponent<IQuestionGroupProps> = props => {
     const { groupName, questionGroups, questions } = props
     const [expandedCategory, setExpandedCategory] = useState<number | null>();
-
+    const numberOfAnsweredQuestions: number[] = useSelector((state: RootState) =>
+        Array.from(
+            new Set(
+                state.survey.Answers
+                    .filter((x: IAnswer) => x.isAnswered)
+                    .map((x: IAnswer) => x.questionId)
+            )
+        )
+    );
+    // let toExpand = false;
+    // const [toExpand, setToExpand] = useState<boolean>(false);
+    
+    console.log('numberOfAnsweredQuestions', numberOfAnsweredQuestions)
 
     const handleCategoryClick = (index: number): void => {
         if (expandedCategory == index) {
@@ -82,7 +95,8 @@ export const QuestionGroups: React.FunctionComponent<IQuestionGroupProps> = prop
         'ENDOKRINI': Endokrini
     };
 
-
+    
+    
     const Options = (): JSX.Element[] => {
         if (!questionGroups) return [];
     
@@ -110,27 +124,42 @@ export const QuestionGroups: React.FunctionComponent<IQuestionGroupProps> = prop
                 mb: 2
             };
 
-            const toExpand = expandedCategory === i;
+            //Ovde se odredjuje broj odgovorenih pitanja i ukupan broj pitanja po kategorijama
+            // toExpand = expandedCategory === i;
+            let toExpand = expandedCategory === i;
 
+            const numberOfQuestions = questions ? questions
+            .filter(x => x.questionGroupId === group.id)
+            .map(q => q.questionGroupId) : [];
+
+            const numberOfAnswered = questions ? questions
+            .filter(question => question.questionGroupId === group.id && numberOfAnsweredQuestions.includes(question.id ? question.id : -1)) : [];
+
+            const completedGroup = (numberOfAnswered ? numberOfAnswered.length : 0) == numberOfQuestions.length
+    
             return (
-                <div className='image-container p-0' key={i}>
+                <div className={`${'image-container'} p-0`} key={i}>
                     <Accordion
                         expanded={toExpand}
                         onChange={() => handleCategoryClick(i)}
-                        sx={{ mb: 1, p: 0, backgroundColor: Colors.MMYellow2lighter }} //accord color
+                        sx={{ mb: 1, p: 0, backgroundColor: completedGroup ? Colors.SuccessColor : Colors.MMYellow2lighter }} //accord color
                     >
                         <AccordionSummary
                             expandIcon={toExpand ? <ExpandLess /> : <ExpandMore />}
                             aria-controls={`panel${i}a-content`}
                             id={`panel${i}a-header`}
+                           
+                            // onClick={()=> setToExpand(!toExpand)}
                         >
                             <div className={`ThisShouldDissapearWhenAccordionOpensDetails ${toExpand ? 'hidden' : 'fade-out'}`}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                                     <Box sx={imgStyle} />
                                     <Box sx={{ flexGrow: 0 }}>
-                                        <Typography>{group.name}</Typography>
-                                        <Typography variant="body2">
-                                            0/{questions ? questions.filter(x => x.questionGroupId === group.id).length : 0}
+                                        <Typography 
+                                        >{group.name?.toUpperCase()}</Typography>
+                                        <Typography variant="body2"
+                                        >
+                                            {numberOfAnswered ? numberOfAnswered.length : 0}/{numberOfQuestions.length}
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -139,14 +168,15 @@ export const QuestionGroups: React.FunctionComponent<IQuestionGroupProps> = prop
                         <AccordionDetails sx={{ p: 0 }}>
                             <Box>
                                 <Typography variant="h4" sx={{ textAlign: 'center', mb: 2 }}>
-                                    {group.name}
+                                {group.id} - {group.name}
                                 </Typography>
                             </Box>
                             <Grid item xs={12} md={4} sx={{ width: '100%', display: 'flex', justifyContent: 'center', borderBottom: '1px dotted lightgrey' }}>
                                 <Box sx={imgStyle2} />
                             </Grid>
     
-                            <SurveyQuestions questionsFiltered={questions ? questions.filter(x => x.questionGroupId === group.id) : []} />
+                            <SurveyQuestions questionsFiltered={questions ? questions.filter(x => x.questionGroupId === group.id) : []} 
+                                completedGroup={completedGroup}/>
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0 }}>
                                 <IconButton onClick={() => setExpandedCategory(null)}>
                                     <Typography variant="body2">ZATVORI</Typography>

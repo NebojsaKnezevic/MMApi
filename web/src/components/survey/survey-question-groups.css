@@ -13,6 +13,16 @@
     margin-bottom: 8px;
 }
 
+.image-containerSucces {
+    transition: transform 0.3s ease, border-left-color 0.3s ease, border-left-width 0.3s ease, margin-top 0.3s ease, margin-bottom 0.3s ease;
+    cursor: pointer;
+    cursor: pointer;
+    cursor: pointer;
+    border-left: solid 5px rgb(108, 214, 180);
+    border-radius: 5px;
+    margin-bottom: 8px;
+}
+
 .image-container:hover {
     transform: scale(1.00);
     /* border-left-color: rgba(241,237,233,255); */

@@ -61,7 +61,7 @@
 //         if (newSelected.has(answerId)) {
 //             console.log('DELETE ELEMENT')
 //             newSelected.delete(answerId); 
-            
+
 //         } else {
 //             newSelected.add(answerId); 
 //         }
@@ -70,7 +70,7 @@
 //     });
 
 //     };
-    
+
 
 //     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 //         setSelectedAnswerId(Number(event.target.value));
@@ -101,7 +101,7 @@
 //             ))
 //         }
 
-       
+
 //     }
 
 //     useEffect(() => {
@@ -142,7 +142,7 @@
 //     useEffect(() => {
 //         handleSingleSelectChange()
 //     }, [selectedAnswerId])
-    
+
 
 //     if (question.isMultipleSelect) {
 //         return (
@@ -157,10 +157,10 @@
 //                                 <FormControlLabel
 //                                     key={answer.id}
 //                                     value={answer.id}
-                                    
+
 //                                     control={<CheckBox color="success" 
-                                  
-                                        
+
+
 //                                         />}
 //                                     label={<Typography variant="body2">{answer.text}</Typography>}
 //                                 />
@@ -202,7 +202,7 @@
 //         </Box>
 //     );
 // };
-
+import Textarea from '@mui/joy/Textarea';
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../../store/store";
 import { useEffect, useState } from "react";
@@ -231,7 +231,8 @@ export interface IAnswer {
     text: string,
     isActive: boolean,
     isSelected: boolean,
-    isSavedInDatabase: boolean
+    isSavedInDatabase: boolean,
+    isAnswered: boolean
 }
 
 export interface IAnswerProps {
@@ -249,17 +250,17 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
     // const filteredAnswers = answers.filter(item => item.questionId === question.id);
 
     const [filteredAnswers, setFilteredAnswers] = useState<IAnswer[]>(answers.filter(item => item.questionId === question.id));
-    const [selectedAnswerId, setSelectedAnswerId] = useState<number | null>(filteredAnswers.find( x => x.isSelected)?.id || null);
+    const [selectedAnswerId, setSelectedAnswerId] = useState<number | null>(filteredAnswers.find(x => x.isSelected)?.id || null);
     const [selectedAnswersIds, setSelectedAnswersIds] = useState<Set<number>>(new Set(filteredAnswers.filter(x => x.isSelected).map(x => x.id)));
 
-    useEffect(()=>{
+    useEffect(() => {
         // console.log(selectedAnswerId)
         // console.log(selectedAnswersIds)
         console.log(filteredAnswers)
-        if(question.isMultipleSelect) handleMultipleSelectChange();
+        if (question.isMultipleSelect) handleMultipleSelectChange();
         else handleSingleSelectChange();
-    },[selectedAnswerId, selectedAnswersIds]);
-    
+    }, [selectedAnswerId, selectedAnswersIds]);
+
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const answerId = Number(event.target.value);
 
@@ -282,8 +283,8 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
         if (selectedAnswersIds.size > 0) {
             const updatedAnswers = filteredAnswers.map(answer => {
                 return selectedAnswersIds.has(answer.id)
-                    ? { ...answer, isSelected: true }
-                    : { ...answer, isSelected: false };
+                    ? { ...answer, isSelected: true, isAnswered: true }
+                    : { ...answer, isSelected: false, isAnswered: false };
             });
             const databasePackage: ISubmitAnswersModel = {
                 questionId: question.id!,
@@ -295,11 +296,11 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
             };
             // console.log(databasePackage)
             let newAnswers: IAnswer[] = answers.map(answer => answer.questionId === question.id ?
-                updatedAnswers.find(a => a.id === answer.id)  || answer
+                updatedAnswers.find(a => a.id === answer.id) || answer
                 : answer)
             dispatch(surveySlice.actions.setAnswers(
                 newAnswers
-                )
+            )
             );
             // console.log(question.id)
             dispatch(SubmitAnswersInDatabase(fetch, databasePackage));
@@ -309,15 +310,15 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
 
     // useEffect(() => {
     //     handleMultipleSelectChange();
-        
+
     // }, [selectedAnswersIds]);
 
     const handleSingleSelectChange = (): void => {
         if (selectedAnswerId !== null) {
             const updatedAnswers = filteredAnswers.map(answer => {
                 return answer.id === selectedAnswerId
-                    ? { ...answer, isSelected: true }
-                    : { ...answer, isSelected: false };
+                    ? { ...answer, isSelected: true, isAnswered: true }
+                    : { ...answer, isSelected: false, isAnswered: false };
             });
 
             const databasePackage: ISubmitAnswersModel = {
@@ -329,7 +330,7 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
                 }))
             };
 
-            let newAnswers: IAnswer[] =  answers.map(answer =>
+            let newAnswers: IAnswer[] = answers.map(answer =>
                 answer.questionId === question.id
                     ? updatedAnswers.find(a => a.id === answer.id) || answer
                     : answer
@@ -346,28 +347,48 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
     // useEffect(() => {
     //     handleSingleSelectChange();
     // }, [selectedAnswerId]);
+    if (filteredAnswers.length == 0) {
+
+        return (
+            <div className="bg-white p-0 border rounded w-100">
+                <Row sx={{ width: '100%  !important', margin: 0 }}>
+                    <Col xs={12} sm={12} md={12} sx={{ padding: 0, width: '100% !important' }}>
+                        <Textarea
+                            sx={{ width: '100% !important', backgroundColor: 'white' }} //l
+                            color="neutral"
+                            disabled={false}
+                            minRows={3}
+                            size="lg"
+                            variant="plain"
+                            placeholder="Odgovor..."
+                        />
+                    </Col>
+                </Row>
+            </div>
+        );
+    }
 
 
     if (question.isMultipleSelect) {
         return (
             <div className="bg-white p-3 border rounded ">
-            {/* {question.id} */}
-                    <Row>
-                        {filteredAnswers
+                {/* {question.id} */}
+                <Row>
+                    {filteredAnswers
                         .map((answer: IAnswer) => (
                             <Col xs={12} sm={12} md={6} key={answer.id}>
                                 <Form.Check
                                     type="checkbox"
                                     color=""
-                                    label={`- ${answer.text}`}
+                                    label={`${answer.text}`}
                                     value={answer.id}
                                     checked={selectedAnswersIds.has(answer.id)}
                                     onChange={handleCheckboxChange}
                                 />
                             </Col>
                         ))}
-                    </Row>
-              
+                </Row>
+
             </div>
         );
     }
@@ -376,15 +397,15 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
         <div className="bg-white p-3 border rounded w-100">
             {/* {question.id} */}
             <Form >
-          
-                    <Row >
-                        {filteredAnswers
+
+                <Row >
+                    {filteredAnswers
                         .map((answer: IAnswer) => (
                             <Col xs={12} sm={12} md={12} key={answer.id}>
-                                
+
                                 <Form.Check
                                     type="checkbox"
-                                    label={`- ${answer.text}`}
+                                    label={`${answer.text}`}
                                     name="answers"
                                     value={answer.id}
                                     checked={selectedAnswerId == answer.id}
@@ -392,8 +413,8 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
                                 />
                             </Col>
                         ))}
-                    </Row>
-              
+                </Row>
+
             </Form>
         </div>
     );

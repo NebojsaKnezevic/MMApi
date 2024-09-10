@@ -1,4 +1,9 @@
 // import { useEffect, useState } from 'react';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
+
 import FormImg from '../../../assets/question-groups/Form.avif'
 import './survey-form.css'
 import { useSelector } from 'react-redux';
@@ -17,6 +22,7 @@ import {
     TextField,
     Typography,
     Checkbox,
+    TextFieldProps,
     // Button,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -35,40 +41,40 @@ export const SurveyForm: React.FunctionComponent<ISurveyFormProps> = props => {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
-        <Box sx={{backgroundColor: 'white'}}>
-        <div className={`mx-0 mx-sm-auto mt-0 border-0 d-flex justify-content-center ${browserWidth <= Sizes.BreakPoint ? 'flex-column' : ''}`}>
-            <div className=' w-100 d-flex align-items-center' style={{ backgroundColor: 'rgba(219,239,239)' }}>
-                <img
-                    src={FormImg}
-                    alt="Form Image"
-                    className="img-fluid w-100 circular-image px-1"
+        <Box sx={{ backgroundColor: 'white' }}>
+            <div className={`mx-0 mx-sm-auto mt-0 border-0 d-flex justify-content-center ${browserWidth <= Sizes.BreakPoint ? 'flex-column' : ''}`}>
+                <div className=' w-100 d-flex align-items-center' style={{ backgroundColor: 'rgba(219,239,239)' }}>
+                    <img
+                        src={FormImg}
+                        alt="Form Image"
+                        className="img-fluid w-100 circular-image px-1"
 
-                />
-            </div>
+                    />
+                </div>
 
-            <div className="card border-0 w-100" style={{ backgroundColor: Colors.MMYellow2lighter }}> 
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '100%',
-                    }}
-                >
-                    <Card sx={{ width: '100%',border:'none', padding: 0, margine: 0, backgroundColor: Colors.MMYellow2lighter,   boxShadow: '0 0 0 0px rgba(0,0,0,0.1)',}}>
-                        <CardContent sx={{ borderTop: 'none', borderRight: 'none', borderBottom: 'none', borderLeft: 'none', backgroundColor:Colors.MMYellow2lighter }}>
-                            <Box sx={{ textAlign: 'center', mb: 2 }}>
-                                <i className="far fa-file-alt fa-4x mb-3 text-primary"></i>
-                                <Typography variant="h6">
-                                    <strong>OPŠTI PODACI</strong>
-                                </Typography>
-                            </Box>
+                <div className="card border-0 w-100" style={{ backgroundColor: Colors.MMYellow2lighter }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%',
+                        }}
+                    >
+                        <Card sx={{ width: '100%', border: 'none', padding: 0, margine: 0, backgroundColor: Colors.MMYellow2lighter, boxShadow: '0 0 0 0px rgba(0,0,0,0.1)', }}>
+                            <CardContent sx={{ borderTop: 'none', borderRight: 'none', borderBottom: 'none', borderLeft: 'none', backgroundColor: Colors.MMYellow2lighter }}>
+                                <Box sx={{ textAlign: 'center', mb: 2 }}>
+                                    <i className="far fa-file-alt fa-4x mb-3 text-primary"></i>
+                                    <Typography variant="h6">
+                                        <strong>OPŠTI PODACI</strong>
+                                    </Typography>
+                                </Box>
 
-                            <Divider sx={{ mb: 2 }} />
+                                <Divider sx={{ mb: 2 }} />
 
-                            <form className='border-0'>
-                                <TextField
+                                <form className='border-0'>
+                                    <TextField
                                         fullWidth
                                         label="Ime"
                                         variant="outlined"
@@ -77,11 +83,11 @@ export const SurveyForm: React.FunctionComponent<ISurveyFormProps> = props => {
                                         id="fullName"
                                         size="small"
                                         InputLabelProps={{
-                                            shrink: true, 
+                                            shrink: true,
                                         }}
                                     />
 
-                                <TextField
+                                    <TextField
                                         fullWidth
                                         label="prezime"
                                         variant="outlined"
@@ -90,12 +96,12 @@ export const SurveyForm: React.FunctionComponent<ISurveyFormProps> = props => {
                                         id="fullName"
                                         size="small"
                                         InputLabelProps={{
-                                            shrink: true, 
+                                            shrink: true,
                                         }}
                                     />
 
 
-                                <TextField
+                                    {/* <TextField
                                     fullWidth
                                     label="Datum rođenja"
                                     type="date"
@@ -104,93 +110,114 @@ export const SurveyForm: React.FunctionComponent<ISurveyFormProps> = props => {
                                     margin="normal"
                                     id="birthDate"
                                     size='small'
-                                />
+                                /> */}
 
-                                <FormControl component="fieldset" margin="normal">
-                                    <FormLabel component="legend">Pol</FormLabel>
-                                    <RadioGroup row aria-labelledby="gender" name="gender" >
-                                        <FormControlLabel value="male" control={<Radio />} label="Muški" />
-                                        <FormControlLabel value="female" control={<Radio />} label="Ženski" />
-                                    </RadioGroup>
-                                </FormControl>
-
-                                <TextField
-                                    fullWidth
-                                    label="Kontakt telefon"
-                                    type="tel"
-                                    variant="outlined"
-                                    margin="normal"
-                                    placeholder="Unesite kontakt telefon"
-                                    id="phone"
-                                    size='small'
-                                    InputLabelProps={{ shrink: true }}
-                                />
-
-                                <TextField
-                                    fullWidth
-                                    label="Email adresa"
-                                    type="email"
-                                    variant="outlined"
-                                    margin="normal"
-                                    placeholder="Unesite email adresu"
-                                    id="email"
-                                    size='small'
-                                    InputLabelProps={{ shrink: true }}
-                                />
-
-                                <Divider sx={{ my: 2 }} />
-
-                                <Typography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
-                                    <strong>PORODIČNA ISTORIJA</strong>
-                                </Typography>
-
-                                <FormControl component="fieldset" margin="normal">
-                                    <FormLabel component="legend">
-                                        Da li u vašoj porodici postoji istorija sledećih bolesti? (Označite ispod koju)
-                                    </FormLabel>
-                                    <FormGroup>
-                                        <FormControlLabel control={<Checkbox />} label="Kardiovaskularne bolesti" />
-                                        <FormControlLabel control={<Checkbox />} label="Dijabetes" />
-                                        <FormControlLabel control={<Checkbox />} label="Kancer (ukoliko da navedite koja vrsta kancera)" />
-                                        <TextField
-                                            fullWidth
-                                            multiline
-                                            rows={3}
-                                            variant="outlined"
-                                            placeholder="Navedi..."
-                                            sx={{ mb: 2 }}
-                                            size='small'
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Datum rođenja"
+                                            views={['year', 'month', 'day']}
+                                            // value={selectedDate}
+                                            // onChange={(newValue) => setSelectedDate(newValue)}
+                                            slotProps={{
+                                                textField: {
+                                                    fullWidth: true,
+                                                    variant: 'outlined',
+                                                    margin: 'normal',
+                                                    size: 'small',
+                                                    InputLabelProps: {
+                                                        shrink: true, 
+                                                      },
+                                                }
+                                            }}
                                         />
-                                        <FormControlLabel control={<Checkbox />} label="Visok krvni pritisak" />
-                                        <FormControlLabel control={<Checkbox />} label="Ostalo (navedite):" />
-                                        <TextField
-                                            fullWidth
-                                            multiline
-                                            rows={3}
-                                            variant="outlined"
-                                            placeholder="Navedi..."
-                                            sx={{ mb: 2 }}
-                                            size='small'
-                                        />
-                                    </FormGroup>
-                                </FormControl>
+                                    </LocalizationProvider>
 
-                                <FormControl component="fieldset" margin="normal">
-                                    <FormLabel component="legend">
-                                        Da li je neko od vaših bliskih rođaka imao ozbiljnu mentalnu bolest? (npr. depresija, šizofrenija)
-                                    </FormLabel>
-                                    <RadioGroup row aria-labelledby="mentalIllness">
-                                        <FormControlLabel value="yes" control={<Radio />} label="Da" />
-                                        <FormControlLabel value="no" control={<Radio />} label="Ne" />
-                                    </RadioGroup>
-                                </FormControl>
-                                
-                            </form>
-                        </CardContent>
-                    </Card>
-                </Box>
+
+                                    <FormControl component="fieldset" margin="normal">
+                                        <FormLabel component="legend">Pol</FormLabel>
+                                        <RadioGroup row aria-labelledby="gender" name="gender" >
+                                            <FormControlLabel value="male" control={<Radio />} label="Muški" />
+                                            <FormControlLabel value="female" control={<Radio />} label="Ženski" />
+                                        </RadioGroup>
+                                    </FormControl>
+
+                                    <TextField
+                                        fullWidth
+                                        label="Kontakt telefon"
+                                        type="tel"
+                                        variant="outlined"
+                                        margin="normal"
+                                        placeholder="Unesite kontakt telefon"
+                                        id="phone"
+                                        size='small'
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+
+                                    <TextField
+                                        fullWidth
+                                        label="Email adresa"
+                                        type="email"
+                                        variant="outlined"
+                                        margin="normal"
+                                        placeholder="Unesite email adresu"
+                                        id="email"
+                                        size='small'
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+
+                                    <Divider sx={{ my: 2 }} />
+
+                                    <Typography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
+                                        <strong>PORODIČNA ISTORIJA</strong>
+                                    </Typography>
+
+                                    <FormControl component="fieldset" margin="normal">
+                                        <FormLabel component="legend">
+                                            Da li u vašoj porodici postoji istorija sledećih bolesti? (Označite ispod koju)
+                                        </FormLabel>
+                                        <FormGroup>
+                                            <FormControlLabel control={<Checkbox />} label="Kardiovaskularne bolesti" />
+                                            <FormControlLabel control={<Checkbox />} label="Dijabetes" />
+                                            <FormControlLabel control={<Checkbox />} label="Kancer (ukoliko da navedite koja vrsta kancera)" />
+                                            <TextField
+                                                fullWidth
+                                                multiline
+                                                rows={3}
+                                                variant="outlined"
+                                                placeholder="Navedi..."
+                                                sx={{ mb: 2 }}
+                                                size='small'
+                                            />
+                                            <FormControlLabel control={<Checkbox />} label="Visok krvni pritisak" />
+                                            <FormControlLabel control={<Checkbox />} label="Ostalo (navedite):" />
+                                            <TextField
+                                                fullWidth
+                                                multiline
+                                                rows={3}
+                                                variant="outlined"
+                                                placeholder="Navedi..."
+                                                sx={{ mb: 2 }}
+                                                size='small'
+                                            />
+                                        </FormGroup>
+                                    </FormControl>
+
+                                    <FormControl component="fieldset" margin="normal">
+                                        <FormLabel component="legend">
+                                            Da li je neko od vaših bliskih rođaka imao ozbiljnu mentalnu bolest? (npr. depresija, šizofrenija)
+                                        </FormLabel>
+                                        <RadioGroup row aria-labelledby="mentalIllness">
+                                            <FormControlLabel value="yes" control={<Radio />} label="Da" />
+                                            <FormControlLabel value="no" control={<Radio />} label="Ne" />
+                                        </RadioGroup>
+                                    </FormControl>
+
+                                </form>
+                            </CardContent>
+                        </Card>
+                    </Box>
+                </div>
             </div>
-        </div>
         </Box>
     );
 }
