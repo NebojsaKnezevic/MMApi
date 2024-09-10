@@ -88,7 +88,7 @@ function NavbarMain() {
   // console.log(UserData)
   
 
-  const pages = ['Survey', 'Test1', 'Test2'];
+  const pages = [''];
   const settings = [ 
     UserData.userData.email != undefined ? UserData.userData.email : ''
     ,UserData.userData.id != null ? `User ID: ${UserData.userData.id}`  : ''
