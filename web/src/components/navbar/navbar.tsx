@@ -121,7 +121,7 @@ function NavbarMain() {
         headers: {'Content-Type':'application/json'},
         credentials: 'include'
       })
-      console.log(await response.json())
+      // console.log(await response.json())
       dispatch(setUserData( {
         IsAuthenticated: false,
         userData: {

@@ -58,7 +58,7 @@ export const fetchAnswers = (fetchExecute: any, userId: number = 0, healthAssesm
                 },
                 credentials: 'include'
             })
-            console.log(`${process.env.REACT_APP_API_ENDPOINT}/Survey/Query/GetAnswers?userId${userId}&healthAssesmentId=${healthAssesmentId}`)
+            // console.log(`${process.env.REACT_APP_API_ENDPOINT}/Survey/Query/GetAnswers?userId${userId}&healthAssesmentId=${healthAssesmentId}`)
             const data = await response.json()
             let result: IAnswer[] = data.Data
             let x: IAnswer[] = result.map((answer:IAnswer) => {

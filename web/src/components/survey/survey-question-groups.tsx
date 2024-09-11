@@ -67,7 +67,7 @@ export const QuestionGroups: React.FunctionComponent<IQuestionGroupProps> = prop
     // let toExpand = false;
     // const [toExpand, setToExpand] = useState<boolean>(false);
     
-    console.log('numberOfAnsweredQuestions', numberOfAnsweredQuestions)
+    // console.log('numberOfAnsweredQuestions', numberOfAnsweredQuestions)
 
     const handleCategoryClick = (index: number): void => {
         if (expandedCategory == index) {
@@ -154,10 +154,10 @@ export const QuestionGroups: React.FunctionComponent<IQuestionGroupProps> = prop
                             <div className={`ThisShouldDissapearWhenAccordionOpensDetails ${toExpand ? 'hidden' : 'fade-out'}`}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                                     <Box sx={imgStyle} />
-                                    <Box sx={{ flexGrow: 0 }}>
-                                        <Typography 
+                                    <Box sx={{ flexGrow: 0,  }}>
+                                        <Typography  sx={{fontSize: '13px'}}
                                         >{group.name?.toUpperCase()}</Typography>
-                                        <Typography variant="body2"
+                                        <Typography variant="body2" sx={{fontSize: '13px'}}
                                         >
                                             {numberOfAnswered ? numberOfAnswered.length : 0}/{numberOfQuestions.length}
                                         </Typography>
@@ -168,7 +168,7 @@ export const QuestionGroups: React.FunctionComponent<IQuestionGroupProps> = prop
                         <AccordionDetails sx={{ p: 0 }}>
                             <Box>
                                 <Typography variant="h4" sx={{ textAlign: 'center', mb: 2 }}>
-                                {group.id} - {group.name}
+                                {group.name}
                                 </Typography>
                             </Box>
                             <Grid item xs={12} md={4} sx={{ width: '100%', display: 'flex', justifyContent: 'center', borderBottom: '1px dotted lightgrey' }}>
