@@ -17,7 +17,7 @@ import Pluca from '../../assets/question-groups/Pluca.avif'
 import Stetoskop from '../../assets/question-groups/Stetoskop.jpg'
 import Endokrini from '../../assets/question-groups/Endokrini.jpg'
 import { Colors } from '../../constants/constants';
-import { Accordion, AccordionDetails, AccordionSummary, Box, Grid, IconButton, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Grid, IconButton, Paper, Typography } from '@mui/material';
 import { ExpandLess, ExpandMore, Margin, Widgets } from '@mui/icons-material';
 import { IAnswer } from './survey-questions/answers/answer';
 // import Pluca from '../../assets/question-groups/Pluca.avif'
@@ -191,10 +191,15 @@ export const QuestionGroups: React.FunctionComponent<IQuestionGroupProps> = prop
     
 
     return (
+        <>
+        {/* <Paper>{groupName}</Paper> */}
         <div >
-            <h3 className='text-center' >{groupName}</h3>
+            {/* <h3 className='text-center' >{groupName}</h3> */}
+            
             {Options()}
         </div>
+        </>
+        
     );
 
 };
