@@ -91,9 +91,10 @@ function NavbarMain() {
   const pages = [''];
   const settings = [ 
     UserData.userData.email != undefined ? UserData.userData.email : ''
-    ,UserData.userData.id != null ? `User ID: ${UserData.userData.id}`  : ''
-    ,HealthAssesment != null ? `HealthAssesment ID: ${HealthAssesment.id}`  : ''
-  ,"Logout"];
+    // ,UserData.userData.id != null ? `User ID: ${UserData.userData.id}`  : ''
+    // ,HealthAssesment != null ? `HealthAssesment ID: ${HealthAssesment.id}`  : ''
+    ,"Rezultati testiranja"
+    ,"Logout"];
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -112,6 +113,16 @@ function NavbarMain() {
 
   const handleLogout = (setting: string) => {
     if (setting === "Logout") dispatch(setUserData({ ...UserData, IsAuthenticated: false }))
+  }
+
+  const handleDownloadFile = () => {
+
+    const link = document.createElement("a");
+    link.download = `RezultatiTestiranja.pdf`;
+    link.href = "files/RezultatiTestiranja.pdf";
+
+    link.click();
+    
   }
 
   const handleLogoutUser = async (): Promise<void> => {
@@ -235,11 +246,11 @@ function NavbarMain() {
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
                   <Typography textAlign="center"sx={{display: 'flex', alignItems: 'center', justifyContent: 'start'}} onClick={() => { handleLogout(setting) }}>
-                    {setting == "Logout" 
-                    ? 
-                    <Box onClick={handleLogoutUser}><LogoutIcon sx={{height: '18px'}}/>{setting}</Box> 
-                    : 
-                    <Box>{setting}</Box>}
+                    {
+                    setting == "Logout" ? <Box onClick={handleLogoutUser}><LogoutIcon sx={{height: '18px'}}/>{setting}</Box> : 
+                    setting == "Rezultati testiranja"  ? <Box onClick={handleDownloadFile}>{setting}</Box> :
+                    <Box>{setting}</Box>
+                    }
                     </Typography>
                 </MenuItem>
               ))}
