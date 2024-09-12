@@ -2,14 +2,21 @@
 import { Card, Container, Nav, Navbar } from 'react-bootstrap';
 import { Outlet } from 'react-router-dom';
 import NavbarMain from '../components/navbar/navbar';
-import { Colors } from '../constants/constants';
+import { Colors, Sizes } from '../constants/constants';
+import { Box, Paper } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+
 
 interface ILayoutPage {
   children?: React.ReactNode;
 }
 export const LayoutPage: React.FunctionComponent<ILayoutPage> = props => {
   // const {children} = props;
-
+  const browserWidth = useSelector((state: RootState) => state.general.browserWidth)
+  let boxWidth = {}
+  if (browserWidth != undefined && browserWidth > Sizes.BreakPoint) boxWidth = { width: '75%' }
+  if (browserWidth != undefined && browserWidth < Sizes.BreakPoint) boxWidth = { width: '100%' }
   return (
     <div className=''>
       <NavbarMain />
@@ -63,11 +70,15 @@ export const LayoutPage: React.FunctionComponent<ILayoutPage> = props => {
           <span className="visually-hidden">Next</span>
         </button>
       </div> */}
+
+
+
       <div className='h-100 LayoutCustom' style={{ backgroundColor: Colors.MMYellow }}>
-        <Container className='h-100' >
+        <Container className='h-100 ' >
           <Card className='border-0 d-flex justify-content-center' style={{ backgroundColor: Colors.MMYellow }} >
             {/* <CardBody className='border-0 '> */}
-            <div className='d-flex justify-content-center'>
+            <div className='d-flex flex-column justify-content-center align-items-center'>
+            {/* <Paper elevation={2} sx={{...boxWidth, mt: 3, bgcolor: Colors.MMYellow2lighter}}> <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height:'50px' }}>NASLOV</Box></Paper> */}
               <Outlet />
             </div>
             {/* </CardBody> */}
