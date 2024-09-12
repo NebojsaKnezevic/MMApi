@@ -256,7 +256,7 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
     useEffect(() => {
         // console.log(selectedAnswerId)
         // console.log(selectedAnswersIds)
-        console.log(filteredAnswers)
+        // console.log(filteredAnswers)
         if (question.isMultipleSelect) handleMultipleSelectChange();
         else handleSingleSelectChange();
     }, [selectedAnswerId, selectedAnswersIds]);
@@ -298,7 +298,7 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
             let newAnswers: IAnswer[] = answers.map(answer => answer.questionId === question.id ?
                 updatedAnswers.find(a => a.id === answer.id) || answer
                 : answer)
-            dispatch(surveySlice.actions.setAnswers(
+                dispatch(surveySlice.actions.setAnswers(
                 newAnswers
             )
             );

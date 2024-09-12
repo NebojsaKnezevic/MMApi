@@ -27,8 +27,8 @@ export const SurveyPage: React.FunctionComponent<ISurveyPage> = props => {
     const userData = useSelector((state: RootState) => state.loginModal)
     const healthAssesment = useSelector((state: RootState) => state.survey.HealthAssesment)
     // Navigate to the next page
-    console.log(userData.userData)
-    console.log(healthAssesment)
+    // console.log(userData.userData)
+    // console.log(healthAssesment)
     const nextPage = () => {
         setCurrentPage(currentPage + 1)
     };
@@ -59,7 +59,7 @@ export const SurveyPage: React.FunctionComponent<ISurveyPage> = props => {
             dispatch(fetchQuestions(fetch));
         }
         if (healthAssesment.id != null && answers.length === 0) {
-            console.log('PRETEBANI ANSWERI')
+            // console.log('PRETEBANI ANSWERI')
             dispatch(fetchAnswers(fetch, userData.userData.id, healthAssesment.id));
         }
         // console.log('Exec sta trba')
