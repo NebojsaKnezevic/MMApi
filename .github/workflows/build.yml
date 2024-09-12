@@ -66,6 +66,10 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        
+     # Add nuget package
+    - name: Execute unit tests
+      run: dotnet nuget add source https://pkgs.dev.azure.com/ACTprojects/ACT/_packaging/ACTFeed/nuget/v3/index.json -n ACTFeed
 
     # Install the .NET Core workload
     - name: Install .NET Core
