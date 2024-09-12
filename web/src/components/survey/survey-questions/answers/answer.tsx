@@ -177,7 +177,7 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
                                 <Form.Check
                                     type="checkbox"
                                     color=""
-                                    label={`${answer.id}`}
+                                    label={`${answer.text}`}
                                     value={answer.id}
                                     checked={selectedAnswersIds.has(answer.id)}
                                     onChange={handleCheckboxChange}
@@ -202,7 +202,7 @@ export const Answer: React.FunctionComponent<IAnswerProps> = (props) => {
 
                                 <Form.Check
                                     type="checkbox"
-                                    label={`${answer.id}`}
+                                    label={`${answer.text}`}
                                     name="answers"
                                     value={answer.id}
                                     checked={selectedAnswerId == answer.id}
