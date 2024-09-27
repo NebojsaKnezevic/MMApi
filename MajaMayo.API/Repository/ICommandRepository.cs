@@ -14,5 +14,8 @@ namespace MajaMayo.API.Repository
 
         Task<HealthAssesmentResponse> CreateNewHealthAssesment(int userId);
         Task<bool> SubmitAnswers(SubmitAnswersModel model);
+
+        Task<bool> UpdateUserData(UserResponse user);
+        Task<bool> InsertUpdateFamilyHistory(FamilyHistoryModel model);
     }
 }

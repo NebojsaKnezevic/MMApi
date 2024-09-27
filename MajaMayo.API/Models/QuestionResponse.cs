@@ -3,7 +3,7 @@
     public class QuestionResponse
     {
         public int Id { get; set; }
-        //public string OrderNo { get; set; }
+        public int OrderNo { get; set; }
         public string Text { get; set; }
         public string AdditionalComment { get; set; }
         public int? QuestionGroupId { get; set; }
@@ -17,6 +17,10 @@
         public List<AnswerResponse>? Answers { get; set; }
         public bool IsMultipleSelect { get; set; }
         public int MaxSelect { get; set; }
+        public int MinSelect { get; set; }
+        public int ParentId { get; set; }
+        public string InputType { get; set; }
+        public bool IsSavedInDB { get; set; } = true;
 
         public QuestionResponse()
         {

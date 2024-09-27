@@ -50,7 +50,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(x => {
-    x.RequireHttpsMetadata = false;
+    x.RequireHttpsMetadata = true;
     x.SaveToken = false;
     x.TokenValidationParameters = new TokenValidationParameters {
         ValidateIssuerSigningKey = true,
@@ -61,7 +61,7 @@ builder.Services.AddAuthentication(options =>
         //),
         ValidateIssuer = false,
         ValidateAudience = false,
-        ClockSkew = TimeSpan.FromMinutes(1)
+        ClockSkew = TimeSpan.FromMinutes(5)
     };
 });
 

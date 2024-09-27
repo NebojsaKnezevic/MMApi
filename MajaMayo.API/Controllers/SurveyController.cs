@@ -23,10 +23,13 @@ using Microsoft.AspNetCore.Identity;
 using MajaMayo.API.Models.Survey.Command.Email;
 using Microsoft.VisualBasic;
 using ACT.Security.Service;
+using MajaMayo.API.Models;
+using MajaMayo.API.Models.Survey.Command.FamilyHistory;
+//using System.Web.Http;
+using MajaMayo.API.Models.Survey.Query.FamilyHistory;
 
 namespace MajaMayo.API.Controllers
 {
-
     [ApiController]
     [Route("Survey")]
     public class SurveyController : ApiController
@@ -42,7 +45,7 @@ namespace MajaMayo.API.Controllers
 
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet("Query/GetQuestions")]
         public async Task<IActionResult> GetQuestions()
         {
@@ -56,14 +59,14 @@ namespace MajaMayo.API.Controllers
         //    var res = await _sender.Send(new GetQuestionsByEmailQuery(email));
         //    return Ok(res);
         //}
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet("Query/GetQiestionGroups")]
         public async Task<IActionResult> GetQuestionGroups() 
         {
             var result = await _sender.Send(new GetQuestionGroupsQuery());
             return Ok(result);
         }
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet("Query/GetAnswers")]
         public async Task<IActionResult> GetAnswers([FromQuery]GetAnswersQuery query) 
         {
@@ -94,14 +97,14 @@ namespace MajaMayo.API.Controllers
         public async Task<IActionResult> LoginUser([FromBody] LoginUserCommand loginUserQuery)
         {
             var result = await _sender.Send(loginUserQuery);
-            return Ok(result.ToDTO());
+            return Ok(result);
         }
 
         [HttpPost("Command/CookieLoginUser")]
         public async Task<IActionResult> CookieLoginUser() 
         {
             var result = await _sender.Send(new CookieLoginUserCommand());
-            return Ok(result.ToDTO());
+            return Ok(result);
         }
 
          [HttpPost("Command/CreateNewHealthAssesment/{userId:int}")]
@@ -150,5 +153,29 @@ namespace MajaMayo.API.Controllers
             var result = await _sender.Send(new EmailVerificationCommand() { Email = data });
             return Ok("<h1>Congrats! You registered successfully!</h1>");
         }
+
+        [HttpPut("Command/UpdateUserData")]
+        public async Task<IActionResult> UpdateUserData([FromBody] UpdateUserCommand user) 
+        {
+            var result = await _sender.Send(user);
+            return Ok(result);
+        }
+
+        [HttpPut("Command/InsertUpdateFamilyHistory")]
+        public async Task<IActionResult> InsertUpdateFamilyHistory([FromBody] InsertUpdateFamilyHistoryCommand insertUpdate) 
+        {
+            var result = await _sender.Send(insertUpdate);
+            return Ok(result);
+        }
+
+        [HttpGet("Query/GetFamilyHistory/{id:int}")]
+        public async Task<IActionResult> GetFamilyHistory( int id)
+        {
+            var par = new GetFamilyHistoryQuery();
+            par.Id = id;
+            var result = await _sender.Send(par);
+            return Ok(result);
+        }
+
     }
 }
