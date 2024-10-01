@@ -15,6 +15,8 @@ namespace MajaMayo.API.Repository
 
         Task<HealthAssesmentResponse> GetHealthAssesment(int userId, int healthAssesmentId = 0);
 
+        Task<FamilyHistoryModel> GetFamilyHistory(int id);
+
 
 
     }

@@ -278,5 +278,43 @@ namespace MajaMayo.API.Repository
             var isVerified = await _connection.ExecuteScalarAsync<bool>("dbo.spVerifyEmail", pars, commandType: CommandType.StoredProcedure);
             return isVerified;
         }
+
+        public async Task<bool> UpdateUserData(UserResponse user)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@Id", user.Id);
+            parameters.Add("@FirstName", user.FirstName);
+            parameters.Add("@LastName", user.LastName);
+            //parameters.Add("@Email", user.Email);
+            parameters.Add("@PhoneNumber", user.PhoneNumber);
+            parameters.Add("@DateOfBirth", user.DateOfBirth);
+            parameters.Add("@Gender", user.Gender);
+            parameters.Add("@PolicyNumber", user.PolicyNumber);
+            parameters.Add("@JMBG", user.JMBG);
+            parameters.Add("@PassportNumber", user.PassportNumber);
+
+            var result = await _connection.ExecuteAsync("dbo.spFormUser", parameters, commandType: CommandType.StoredProcedure);
+
+            return result > 0; 
+        }
+
+        public async Task<bool> InsertUpdateFamilyHistory(FamilyHistoryModel model)
+        {
+            var pars = new DynamicParameters();
+
+            pars.Add("@Id", model.Id, DbType.Int32);
+            pars.Add("@Cardiovascular", model.Cardiovascular, DbType.Boolean);
+            pars.Add("@Diabetes", model.Diabetes, DbType.Boolean);
+            pars.Add("@Cancer", model.Cancer, DbType.Boolean);
+            pars.Add("@CancerType", model.CancerType, DbType.String);
+            pars.Add("@HighBloodPressure", model.HighBloodPressure, DbType.Boolean);
+            pars.Add("@Other", model.Other, DbType.String);
+            pars.Add("@OtherConditions", model.OtherConditions, DbType.String);
+            pars.Add("@MentalIllness", model.MentalIllness, DbType.Boolean);
+
+            var result = await _connection.ExecuteAsync("dbo.spInsertUpdateFamilyHistory", pars, commandType: CommandType.StoredProcedure);
+
+            return result > 0;
+        }
     }
 }
