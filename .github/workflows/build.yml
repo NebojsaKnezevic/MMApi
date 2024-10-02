@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Get list of folders
 
 on:
   workflow_dispatch
