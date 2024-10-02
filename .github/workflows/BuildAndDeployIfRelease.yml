@@ -47,9 +47,12 @@ jobs:
         # Ensure SSH connection
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo 'SSH connection successful'"
         
+        # Ensure correct permissions on the target directory
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S mkdir -p /var/www/api/html && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER /var/www/api/html"
+        
         # Deploy the application
-        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" --rsync-path="echo $SSH_PASSWORD | sudo -S rsync" ./publish/MajaMayo.API/ $SSH_USER@$SSH_HOST:/var/www/api/html
-
+        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.API/ $SSH_USER@$SSH_HOST:/var/www/api/html
+        
         # List newly copied files
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "ls -l /var/www/api/html"
 
