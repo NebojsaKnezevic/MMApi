@@ -34,5 +34,17 @@ jobs:
     - name: Publish MajaMayo.API
       run: dotnet publish MajaMayo.API/MajaMayo.API.csproj --configuration Release --output ./publish/MajaMayo.API
 
+    - name: Install sshpass
+      run: sudo apt-get install -y sshpass
+    
+    - name: Deploy to Server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "mkdir -p /path/to/deploy"
+        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.API/ $SSH_USER@$SSH_HOST:/path/to/deploy
+
 
     
