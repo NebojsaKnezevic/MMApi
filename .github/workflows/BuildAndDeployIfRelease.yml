@@ -1,0 +1,51 @@
+name: Build and Deploy
+
+on:
+  workflow_dispatch
+  #push:
+    #branches:
+      #- main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Authenticate with Azure Artifacts
+      run: |
+       dotnet nuget add source --store-password-in-clear-text --name "ACTFeed" --username "AzureArtifacts" --password ${{ secrets.AZURE_ARTIFACTS_PAT }} "https://pkgs.dev.azure.com/ACTprojects/ACT/_packaging/ACTFeed/nuget/v3/index.json"
+      env:
+       AZURE_ARTIFACTS_PAT: ${{ secrets.AZURE_ARTIFACTS_PAT }}
+
+
+    - name: Restore dependencies
+      run: dotnet restore MajaMayo.Backend.sln
+    
+    - name: Build
+      run: dotnet build MajaMayo.Backend.sln --configuration Release --no-restore
+    
+    - name: Publish MajaMayo.API
+      run: dotnet publish MajaMayo.API/MajaMayo.API.csproj --configuration Release --output ./publish/MajaMayo.API
+
+    - name: Install sshpass
+      run: sudo apt-get install -y sshpass
+    
+    - name: Deploy to Server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "mkdir -p /var/www/api/html"
+        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.API/ $SSH_USER@$SSH_HOST:/var/www/api/html
+
+
+    
