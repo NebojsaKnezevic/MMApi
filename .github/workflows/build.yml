@@ -11,20 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-    - name: Check for Conflicting Services
-      env:
-        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-        SSH_HOST: ${{ secrets.SSH_HOST }}
-        SSH_USER: ${{ secrets.SSH_USER }}
-      run: |
-        # Check for conflicting services
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
-          if lsof -i :80; then
-            echo 'Port 80 is in use. Exiting...';
-            exit 1;
-          fi
-        "
     - name: Get directories
       env:
         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
@@ -35,7 +21,10 @@ jobs:
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S mkdir -p /var/www/api/html && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER /var/www/api/html"
            
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S systemctl status nginx"
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo - S lsof -i -P -n | grep LISTEN
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S  nginx -t"
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S  ufw status"
+
+
 
 
 
