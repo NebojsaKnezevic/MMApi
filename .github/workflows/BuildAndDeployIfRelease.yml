@@ -26,12 +26,13 @@ jobs:
 
 
     - name: Restore dependencies
-      run: dotnet restore
-
+      run: dotnet restore MajaMayo.Backend.sln
+    
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build MajaMayo.Backend.sln --configuration Release --no-restore
+    
+    - name: Publish MajaMayo.API
+      run: dotnet publish MajaMayo.API/MajaMayo.API.csproj --configuration Release --output ./publish/MajaMayo.API
 
-    - name: Publish
-      run: dotnet publish --configuration Release --no-build --output ./publish
 
     
