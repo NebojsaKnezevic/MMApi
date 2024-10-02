@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Publish backend to Production
 
 on:
   workflow_dispatch
@@ -51,16 +51,13 @@ jobs:
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S mkdir -p /var/www/api/html && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER /var/www/api/html"
         
         # Deploy the application
-        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.API/ $SSH_USER@$SSH_HOST:/var/www/api/html
-        
-        # List newly copied files
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "ls -l /var/www/api/html"
+        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.API/ $SSH_USER@$SSH_HOST:/var/www/api/html        
 
         # Clear Nginx cache
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S rm -rf /var/cache/nginx/*"
         
         # Restart Nginx
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S systemctl restart nginx"
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S systemctl reload nginx"
 
         
 
