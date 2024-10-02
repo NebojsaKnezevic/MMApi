@@ -30,7 +30,10 @@ jobs:
       run: dotnet restore MajaMayo.Backend.sln
     
     - name: Build
+      env:
+          CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}          
       run: dotnet build MajaMayo.Backend.sln --configuration Release --no-restore
+      
     
     - name: Publish MajaMayo.API
       run: dotnet publish MajaMayo.API/MajaMayo.API.csproj --configuration Release --output ./publish/MajaMayo.API
