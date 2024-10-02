@@ -20,11 +20,9 @@ jobs:
 
     - name: Authenticate with Azure Artifacts
       run: |
-        echo "##vso[task.setvariable variable=NUGET_AUTH_TOKEN]${{ secrets.AZURE_ARTIFACTS_PAT }}"
-        dotnet nuget add source --username "AzureArtifacts" --password $NUGET_AUTH_TOKEN --store-password-in-clear-text --name "ACTFeed" "https://pkgs.dev.azure.com/ACTprojects/ACT/_packaging/ACTFeed/nuget/v3/index.json"
+       dotnet nuget add source --store-password-in-clear-text --name "ACTFeed" --username "AzureArtifacts" --password ${{ secrets.AZURE_ARTIFACTS_PAT }} "https://pkgs.dev.azure.com/ACTprojects/ACT/_packaging/ACTFeed/nuget/v3/index.json"
       env:
-        AZURE_ARTIFACTS_PAT: ${{ secrets.AZURE_ARTIFACTS_PAT }}
-
+       AZURE_ARTIFACTS_PAT: ${{ secrets.AZURE_ARTIFACTS_PAT }}
 
 
     - name: Restore dependencies
