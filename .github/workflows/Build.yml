@@ -41,5 +41,5 @@ jobs:
         DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
         SECURITY_KEY: ${{ secrets.SECURITY_KEY }}
         SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-      run: dotnet test MajaMayo.Backend/MajaMayo.API.Test.csproj --no-build --verbosity normal
+      run: dotnet test MajaMayo.Backend/MajaMayo.API.Test/MajaMayo.API.Test.csproj --no-build --verbosity normal
       
