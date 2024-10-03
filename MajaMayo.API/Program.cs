@@ -5,11 +5,23 @@ using MajaMayo.API.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddLogging();
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+builder.Services.AddScoped<GlobalExceptionHandlerMiddleware>();
+
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext());
+
 
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
@@ -17,9 +29,6 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.Logging.ClearProviders(); // Clear default providers if you only want specific providers
-builder.Logging.AddConsole(); // Add console logging
-builder.Logging.SetMinimumLevel(LogLevel.Error);
 
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -98,6 +107,20 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.IncludeQueryInRequestPath = true;
+
+    options.MessageTemplate = "Executed by {UserName} - " + options.MessageTemplate;
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("UserName", httpContext.User?.Identity?.Name ?? "");
+    };
+});
+
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
