@@ -27,6 +27,8 @@ using MajaMayo.API.Models;
 using MajaMayo.API.Models.Survey.Command.FamilyHistory;
 //using System.Web.Http;
 using MajaMayo.API.Models.Survey.Query.FamilyHistory;
+using Microsoft.Extensions.Options;
+using MajaMayo.API.ConfigModel;
 
 namespace MajaMayo.API.Controllers
 {
@@ -35,13 +37,12 @@ namespace MajaMayo.API.Controllers
     public class SurveyController : ApiController
     {
         private readonly ISender _sender;
-        private readonly IConfiguration _configuration;
+        
 
-
-        public SurveyController(ISender sender, IConfiguration configuration) : base(sender)
+        public SurveyController(ISender sender) : base(sender)
         {
             _sender = sender;
-            _configuration = configuration;
+
 
         }
 

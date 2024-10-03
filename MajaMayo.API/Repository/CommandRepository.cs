@@ -3,11 +3,13 @@ using ACT.Security.Service;
 using Dapper;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using MajaMayo.API.ConfigModel;
 using MajaMayo.API.DTOs;
 using MajaMayo.API.Models;
 using MajaMayo.API.Models.Survey.Command.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MimeKit;
 using System.Data;
@@ -22,31 +24,36 @@ namespace MajaMayo.API.Repository
     public class CommandRepository : ICommandRepository
     {
         private readonly IDbConnection _connection;
-        private readonly IConfiguration _configuration;
+       
         private readonly IHttpContextAccessor _httpContext;
         //private readonly UserManager<UserResponse> _userManager;
         private readonly string SecretTokenName = "ACTTokenAuth";
         //private readonly UserManager<UserResponse> _userManager;
+        private readonly SecuritySettings _securitySettings;
+        private readonly EmailSettings _emailSettings;
 
         public CommandRepository(
-            IDbConnection connection, 
-            IConfiguration configuration, 
+            IDbConnection connection,
+            IOptions<SecuritySettings> securitySettings,
+            IOptions<EmailSettings> emailSettings,
             IHttpContextAccessor httpContext)
         {
             _connection = connection;
-            _configuration = configuration;
+            _emailSettings = emailSettings.Value;
+            _securitySettings = securitySettings.Value;
+
             _httpContext = httpContext;
             //_userManager = userManager;
         }
         public async Task<bool> RegisterUser(string Email, string Pwd)
         {
-            Pwd = Security.Encrypt(_configuration.GetSection("SecurityKey").Value!, Pwd);
+            Pwd = Security.Encrypt(_securitySettings.SecurityKey, Pwd);
             var pars = new { Email = Email, Pwd = Pwd };
             var result = await _connection.ExecuteScalarAsync<bool>("spRegisterUser", pars, commandType: CommandType.StoredProcedure);
             if (!result) throw new Exception("Email already exists!");
 
             // Encrypt Email
-            var emailVerification = Security.Encrypt(_configuration.GetSection("SecurityKey").Value!, Email);
+            var emailVerification = Security.Encrypt(_securitySettings.SecurityKey, Email);
 
             // URL Encode the encrypted email
             //var encodedEmail = System.Net.WebUtility.UrlEncode(emailVerification);
@@ -82,7 +89,7 @@ namespace MajaMayo.API.Repository
         public void SendEmail(EmailDTO email)
         {
             var mail = new MimeMessage();
-            mail.From.Add(new MailboxAddress(_configuration["EmailSettings:FromName"], _configuration["EmailSettings:FromEmail"]));
+            mail.From.Add(new MailboxAddress(_emailSettings.FromName, _emailSettings.FromEmail));
             mail.To.Add(new MailboxAddress("", email.To));
             mail.Subject = email.Subject;
 
@@ -91,8 +98,8 @@ namespace MajaMayo.API.Repository
 
             using (var smtp = new SmtpClient())
             {
-                smtp.Connect(_configuration["EmailSettings:SmtpServer"], 587, SecureSocketOptions.StartTls);
-                smtp.Authenticate(_configuration["EmailSettings:Username"], _configuration["EmailSettings:Password"]);
+                smtp.Connect(_emailSettings.SmtpServer, _emailSettings.Port, SecureSocketOptions.StartTls);
+                smtp.Authenticate(_emailSettings.Username, _emailSettings.Password);
                 smtp.Send(mail);
                 smtp.Disconnect(true);
             }
@@ -102,7 +109,7 @@ namespace MajaMayo.API.Repository
         {
             try
             {
-                Pwd = Security.Encrypt(_configuration.GetSection("SecurityKey").Value!, Pwd);
+                Pwd = Security.Encrypt(_securitySettings.SecurityKey, Pwd);
                 var pars = new { Email = Email, Pwd = Pwd };
                 var result = await _connection.QuerySingleAsync<UserResponse>("spLoginUser", pars, commandType: CommandType.StoredProcedure);
                 var tokenString = GenerateJWTToken(result);
@@ -155,7 +162,7 @@ namespace MajaMayo.API.Repository
                 expires: DateTime.UtcNow.AddHours(12),
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(
-                       Encoding.UTF8.GetBytes(_configuration.GetSection("SecurityKey").Value!)
+                       Encoding.UTF8.GetBytes(_securitySettings.SecurityKey)
                         ),
                     SecurityAlgorithms.HmacSha256Signature)
                 );
@@ -272,7 +279,7 @@ namespace MajaMayo.API.Repository
         public async Task<bool> EmailVerification(string encryptedData)
         {
             //var decoded = System.Net.WebUtility.UrlDecode(encryptedData);
-            var decryptEmail = Security.Decrypt(_configuration.GetSection("SecurityKey").Value!, encryptedData);
+            var decryptEmail = Security.Decrypt(_securitySettings.SecurityKey, encryptedData);
             var pars = new DynamicParameters();
             pars.Add("@Email", decryptEmail, DbType.String);
             var isVerified = await _connection.ExecuteScalarAsync<bool>("dbo.spVerifyEmail", pars, commandType: CommandType.StoredProcedure);

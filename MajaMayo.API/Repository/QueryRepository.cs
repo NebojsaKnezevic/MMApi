@@ -14,18 +14,16 @@ namespace MajaMayo.API.Repository
     {
         private readonly IDbConnection _context;
         private readonly IHttpContextAccessor _httpContext;
-        private readonly IConfiguration _configuration;
 
         private List<CommonResponseObject> _response;
         private IEnumerable<QuestionGroupResponse> _questionGroups;
         private IEnumerable<QuestionResponse> _questions;
         private IEnumerable<AnswerResponse> _answers;
 
-        public QueryRepository(IDbConnection context, IHttpContextAccessor httpContext, IConfiguration configuration)
+        public QueryRepository(IDbConnection context, IHttpContextAccessor httpContext)
         {
             _context = context;
             _httpContext = httpContext;
-            _configuration = configuration;
         }
 
         public async Task<ICollection<QuestionResponse>> GetQuestions()
