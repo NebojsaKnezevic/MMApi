@@ -43,18 +43,23 @@ jobs:
     - name: Install sshpass
       run: sudo apt-get install -y sshpass
 
+    - name: Set TIMESTAMP and BACKUP_DIR
+      id: vars
+      run: |
+         echo "TIMESTAMP=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+         echo "BACKUP_DIR=/var/www/api/backup/html_$TIMESTAMP" >> $GITHUB_ENV
+    
     - name: Create backup and copy existing files
       env:
-        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-        SSH_HOST: ${{ secrets.SSH_HOST }}
-        SSH_USER: ${{ secrets.SSH_USER }}
+         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+         SSH_HOST: ${{ secrets.SSH_HOST }}
+         SSH_USER: ${{ secrets.SSH_USER }}
+         BACKUP_DIR: ${{ env.BACKUP_DIR }}
       run: |
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST '
-          TIMESTAMP=$(date +%Y%m%d%H%M%S)
-          BACKUP_DIR="/var/www/api/backup/html_$TIMESTAMP"
-          echo $SSH_PASSWORD | sudo -S mkdir -p $BACKUP_DIR && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER $BACKUP_DIR"
-          echo $SSH_PASSWORD | sudo -S cp -r /var/www/api/html/* $BACKUP_DIR
-        '
+        # Ensure correct permissions on the target directory
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S mkdir -p $BACKUP_DIR && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER $BACKUP_DIR"
+        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" $SSH_USER@$SSH_HOST:/var/www/api/html/ $SSH_USER@$SSH_HOST:$BACKUP_DIR     
+
         
     - name: Deploy to Server
       env:
