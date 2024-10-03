@@ -31,7 +31,9 @@ jobs:
     
     - name: Build
       env:
-          CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}          
+          DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}    
+          SECURITY_KEY: ${{ secrets.SECURITY_KEY }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
       run: dotnet build MajaMayo.Backend.sln --configuration Release --no-restore
       
     
