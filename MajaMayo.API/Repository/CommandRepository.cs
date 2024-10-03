@@ -148,10 +148,10 @@ namespace MajaMayo.API.Repository
         {
             var claims = new List<Claim> {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.FirstName),
-            new Claim(ClaimTypes.Surname, user.LastName),
+            //new Claim(ClaimTypes.Name, user.FirstName),
+            //new Claim(ClaimTypes.Surname, user.LastName),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Gender, user.Gender),
+            //new Claim(ClaimTypes.Gender, user.Gender),
             new Claim(ClaimTypes.GivenName, user.FirstName + user.LastName),
             new Claim(ClaimTypes.Role, "Admin")
             };
@@ -190,10 +190,10 @@ namespace MajaMayo.API.Repository
 
                 //var expTime = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Expiration)?.Value;
                 var id = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-                var firstName = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value;
-                var lastName = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Surname)?.Value;
+                //var firstName = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value;
+                //var lastName = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Surname)?.Value;
                 var email = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
-                var gender = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Gender)?.Value;
+                //var gender = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Gender)?.Value;
                 var givenName = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.GivenName)?.Value;
 
                 if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(email))
@@ -203,16 +203,16 @@ namespace MajaMayo.API.Repository
                 userDataFromCookie = new UserResponse
                 {
                     Id = int.Parse(id),
-                    FirstName = firstName,
-                    LastName = lastName,
+                    //FirstName = firstName,
+                    //LastName = lastName,
                     Email = email,
-                    Gender = gender
+                    //Gender = gender
                 };
                 pars.Add("@Id", id, DbType.Int32, ParameterDirection.Input);
-                pars.Add("@FirstName", firstName, DbType.String, ParameterDirection.Input);
-                pars.Add("@LastName", lastName, DbType.String, ParameterDirection.Input);
+                //pars.Add("@FirstName", firstName, DbType.String, ParameterDirection.Input);
+                //pars.Add("@LastName", lastName, DbType.String, ParameterDirection.Input);
                 pars.Add("@Email", email, DbType.String, ParameterDirection.Input);
-                pars.Add("@Gender", gender, DbType.String, ParameterDirection.Input);
+                //pars.Add("@Gender", gender, DbType.String, ParameterDirection.Input);
 
             }
             catch (Exception ex)
