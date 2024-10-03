@@ -38,6 +38,10 @@ jobs:
       
     
     - name: Publish MajaMayo.API
+      env:
+          DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}    
+          SECURITY_KEY: ${{ secrets.SECURITY_KEY }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
       run: dotnet publish MajaMayo.API/MajaMayo.API.csproj --configuration Release --output ./publish/MajaMayo.API
 
     - name: Install sshpass
