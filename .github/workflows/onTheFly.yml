@@ -27,10 +27,9 @@ jobs:
          SSH_USER: ${{ secrets.SSH_USER }}
       run: |
          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
-           source ~/.profile
-           echo 'DB_CONNECTION_STRING: ' $DB_CONNECTION_STRING
-           echo 'SECURITY_KEY: ' $SECURITY_KEY
-           echo 'SMTP_PASSWORD: ' $SMTP_PASSWORD
+           printenv DB_CONNECTION_STRING
+           printenv SECURITY_KEY
+           printenv SMTP_PASSWORD
          "
     
 
