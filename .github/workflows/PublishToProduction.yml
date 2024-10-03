@@ -44,6 +44,10 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
       run: dotnet publish MajaMayo.API/MajaMayo.API.csproj --configuration Release --output ./publish/MajaMayo.API
 
+    - name: Publish Tests
+      run: dotnet publish MajaMayo.Tests/MajaMayo.Tests.csproj --configuration Release --output ./publish/MajaMayo.Tests
+
+
     - name: Install sshpass
       run: sudo apt-get install -y sshpass
 
@@ -99,6 +103,24 @@ jobs:
         # Restart Nginx
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S systemctl reload nginx"
 
+    - name: Deploy Tests to Server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.Tests/ $SSH_USER@$SSH_HOST:/var/www/api/tests
+    
+    - name: Run Tests on Server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+          cd /var/www/api/tests
+          dotnet test
+        "
         
 
 
