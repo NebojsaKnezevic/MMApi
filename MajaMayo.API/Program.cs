@@ -1,6 +1,7 @@
+using MajaMayo.API.ConfigModel;
 using MajaMayo.API.Middlewares;
-using MajaMayo.API.Models;
 using MajaMayo.API.Repository;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -20,8 +21,38 @@ builder.Services.AddSwaggerGen();
 builder.Logging.AddConsole(); // Add console logging
 builder.Logging.SetMinimumLevel(LogLevel.Error);
 
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddScoped<IDbConnection>(o => 
-new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+    new SqlConnection(connectionString)
+    );
+
+builder.Services.Configure<SecuritySettings>(options =>
+{
+    var section = builder.Configuration.GetSection(SecuritySettings.Name);
+    section.Bind(options);
+
+    var securityKey = Environment.GetEnvironmentVariable("SECURITY_KEY");
+    if (!string.IsNullOrEmpty(securityKey))
+    {
+        options.SecurityKey = securityKey;
+    }
+});
+
+
+builder.Services.Configure<EmailSettings>(options =>
+{
+    var section = builder.Configuration.GetSection(EmailSettings.Name);
+    section.Bind(options);
+
+
+    var smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
+    if (!string.IsNullOrEmpty(smtpPassword))
+    {
+        options.Password = smtpPassword;
+    }
+});
+
 
 builder.Services.AddScoped<IQueryRepository, QueryRepository>();
 builder.Services.AddScoped<ICommandRepository, CommandRepository>();
@@ -41,8 +72,9 @@ builder.Services.AddCors(options =>
         });
 });
 
-//Console.WriteLine(builder.Configuration.GetSection("SecurityKey").Value!);
-var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("SecurityKey").Value!);
+var securityKey = Environment.GetEnvironmentVariable("SECURITY_KEY") ?? builder.Configuration.GetSection(SecuritySettings.Name + ":SecurityKey").Value!;
+
+var key = Encoding.ASCII.GetBytes(securityKey);
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
