@@ -57,8 +57,7 @@ jobs:
          BACKUP_DIR: ${{ env.BACKUP_DIR }}
       run: |
         # Ensure correct permissions on the target directory
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S mkdir -p $BACKUP_DIR && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER $BACKUP_DIR"
-        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" $SSH_USER@$SSH_HOST:/var/www/api/html/ $SSH_USER@$SSH_HOST:$BACKUP_DIR     
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S mkdir -p $BACKUP_DIR && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER $BACKUP_DIR | sudo -S cp -r /var/www/api/html/* $BACKUP_DIR"   
 
         
     - name: Deploy to Server
