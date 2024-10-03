@@ -18,7 +18,7 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
 
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "ls -lR /var/www/act/html"
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "ls -lR /var/www/api/html"
 
 
 
