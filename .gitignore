@@ -401,3 +401,4 @@ typings/
 
 # Yarn Integrity file
 .yarn-integrity
+/MajaMayo.API/appsettings.Development.json
