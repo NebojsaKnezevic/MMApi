@@ -53,7 +53,7 @@ jobs:
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           BACKUP_DIR="/var/www/api/backup/html_$TIMESTAMP"
           echo $SSH_PASSWORD | sudo -S mkdir -p $BACKUP_DIR
-          cp -r /var/www/api/html/* $BACKUP_DIR
+          echo $SSH_PASSWORD | sudo -S cp -r /var/www/api/html/* $BACKUP_DIR
         '
         
     - name: Deploy to Server
