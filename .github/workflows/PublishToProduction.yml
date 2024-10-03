@@ -73,12 +73,9 @@ jobs:
         SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
       run: |
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
-          export DB_CONNECTION_STRING='$DB_CONNECTION_STRING'
-          export SECURITY_KEY='$SECURITY_KEY'
-          export SMTP_PASSWORD='$SMTP_PASSWORD'
-          echo 'DB_CONNECTION_STRING: ' \$DB_CONNECTION_STRING
-          echo 'SECURITY_KEY: ' \$SECURITY_KEY
-          echo 'SMTP_PASSWORD: ' \$SMTP_PASSWORD
+          echo 'DB_CONNECTION_STRING=\"$DB_CONNECTION_STRING\"' | sudo tee -a /etc/environment
+          echo 'SECURITY_KEY=\"$SECURITY_KEY\"' | sudo tee -a /etc/environment
+          echo 'SMTP_PASSWORD=\"$SMTP_PASSWORD\"' | sudo tee -a /etc/environment
         "
         
     - name: Deploy to Server
