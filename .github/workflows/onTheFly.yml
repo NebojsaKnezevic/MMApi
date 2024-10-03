@@ -20,8 +20,19 @@ jobs:
 
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "ls -lR /var/www/api/html"
 
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cat /var/www/api/html/appsettings.json"
-
+    - name: Print environment variables on remote server
+      env:
+         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+         SSH_HOST: ${{ secrets.SSH_HOST }}
+         SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+           source ~/.profile
+           echo 'DB_CONNECTION_STRING: ' $DB_CONNECTION_STRING
+           echo 'SECURITY_KEY: ' $SECURITY_KEY
+           echo 'SMTP_PASSWORD: ' $SMTP_PASSWORD
+         "
+    
 
 
 
