@@ -30,22 +30,14 @@ jobs:
       run: dotnet restore MajaMayo.Backend.sln
     
     - name: Build
-      env:
-          DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}    
-          SECURITY_KEY: ${{ secrets.SECURITY_KEY }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
       run: dotnet build MajaMayo.Backend.sln --configuration Release --no-restore
       
     
     - name: Publish MajaMayo.API
-      env:
-          DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}    
-          SECURITY_KEY: ${{ secrets.SECURITY_KEY }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
       run: dotnet publish MajaMayo.API/MajaMayo.API.csproj --configuration Release --output ./publish/MajaMayo.API
 
     - name: Publish Tests
-      run: dotnet publish MajaMayo.Tests/MajaMayo.Tests.csproj --configuration Release --output ./publish/MajaMayo.Tests
+      run: dotnet publish MajaMayo.API.Test/MajaMayo.API.Test.csproj --configuration Release --output ./publish/MajaMayo.Tests
 
 
     - name: Install sshpass
