@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '**'  # This will trigger the workflow on any branch
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Authenticate with Azure Artifacts
+      run: |
+       dotnet nuget add source --store-password-in-clear-text --name "ACTFeed" --username "AzureArtifacts" --password ${{ secrets.AZURE_ARTIFACTS_PAT }} "https://pkgs.dev.azure.com/ACTprojects/ACT/_packaging/ACTFeed/nuget/v3/index.json"
+      env:
+       AZURE_ARTIFACTS_PAT: ${{ secrets.AZURE_ARTIFACTS_PAT }}
+
+
+    - name: Restore dependencies
+      run: dotnet restore MajaMayo.Backend.sln
+    
+    - name: Build
+      env:
+          DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}    
+          SECURITY_KEY: ${{ secrets.SECURITY_KEY }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      run: dotnet build MajaMayo.Backend.sln --configuration Release --no-restore
+
+    - name: Test
+      env:
+        DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
+        SECURITY_KEY: ${{ secrets.SECURITY_KEY }}
+        SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      run: dotnet test MajaMayo.Tests/MajaMayo.Tests.csproj --no-build --verbosity normal
+      

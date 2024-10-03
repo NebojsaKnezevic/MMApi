@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Publish backend to Production
 
 on:
   workflow_dispatch
@@ -30,14 +30,32 @@ jobs:
       run: dotnet restore MajaMayo.Backend.sln
     
     - name: Build
+      env:
+          DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}    
+          SECURITY_KEY: ${{ secrets.SECURITY_KEY }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
       run: dotnet build MajaMayo.Backend.sln --configuration Release --no-restore
+      
     
     - name: Publish MajaMayo.API
       run: dotnet publish MajaMayo.API/MajaMayo.API.csproj --configuration Release --output ./publish/MajaMayo.API
 
     - name: Install sshpass
       run: sudo apt-get install -y sshpass
-    
+
+    - name: Create backup and copy existing files
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST '
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          BACKUP_DIR="/var/www/api/backup/html_$TIMESTAMP"
+          mkdir -p $BACKUP_DIR
+          cp -r /var/www/api/html/* $BACKUP_DIR
+        '
+        
     - name: Deploy to Server
       env:
         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
@@ -51,16 +69,13 @@ jobs:
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S mkdir -p /var/www/api/html && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER /var/www/api/html"
         
         # Deploy the application
-        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.API/ $SSH_USER@$SSH_HOST:/var/www/api/html
-        
-        # List newly copied files
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "ls -l /var/www/api/html"
+        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.API/ $SSH_USER@$SSH_HOST:/var/www/api/html        
 
         # Clear Nginx cache
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S rm -rf /var/cache/nginx/*"
         
         # Restart Nginx
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S systemctl restart nginx"
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S systemctl reload nginx"
 
         
 
