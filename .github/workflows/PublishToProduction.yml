@@ -38,6 +38,7 @@ jobs:
 
     - name: Publish Tests
       run: dotnet publish MajaMayo.API.Test/MajaMayo.API.Test.csproj --configuration Release --output ./publish/MajaMayo.Tests
+        cp MajaMayo.API.Test/MajaMayo.API.Test.csproj ./publish/MajaMayo.API.Test/
 
 
     - name: Install sshpass
@@ -102,9 +103,9 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
         # Ensure correct permissions on the target directory
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S mkdir -p /var/www/api/tests && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER /var/www/api/tests"
-        
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S mkdir -p /var/www/api/tests && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER /var/www/api/tests"        
         sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.Tests/ $SSH_USER@$SSH_HOST:/var/www/api/tests
+        
     
     - name: Run Tests on Server
       env:
@@ -113,8 +114,10 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+          export DOTNET_ROOT=/usr/local/share/dotnet
+          export PATH=\$PATH:/usr/local/share/dotnet:/usr/local/share/dotnet/tools
           cd /var/www/api/tests
-          dotnet test
+          dotnet test MajaMayo.API.Test.csproj
         "
         
 
