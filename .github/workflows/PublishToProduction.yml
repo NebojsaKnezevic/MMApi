@@ -37,8 +37,10 @@ jobs:
       run: dotnet publish MajaMayo.API/MajaMayo.API.csproj --configuration Release --output ./publish/MajaMayo.API
 
     - name: Publish Tests
-      run: dotnet publish MajaMayo.API.Test/MajaMayo.API.Test.csproj --configuration Release --output ./publish/MajaMayo.Tests
-        cp MajaMayo.API.Test/MajaMayo.API.Test.csproj ./publish/MajaMayo.API.Test/
+      run: dotnet publish MajaMayo.API.Test/MajaMayo.API.Test.csproj --configuration Release --output ./publish/MajaMayo.API.Test
+    
+    - name: Copy .csproj file to publish directory
+      run: cp MajaMayo.API.Test/MajaMayo.API.Test.csproj ./publish/MajaMayo.API.Test/
 
 
     - name: Install sshpass
