@@ -36,12 +36,7 @@ jobs:
     - name: Publish MajaMayo.API
       run: dotnet publish MajaMayo.API/MajaMayo.API.csproj --configuration Release --output ./publish/MajaMayo.API
 
-    - name: Publish Tests
-      run: dotnet publish MajaMayo.API.Test/MajaMayo.API.Test.csproj --configuration Release --output ./publish/MajaMayo.API.Test
     
-    - name: Copy .csproj file to publish directory
-      run: cp MajaMayo.API.Test/MajaMayo.API.Test.csproj ./publish/MajaMayo.API.Test/
-
 
     - name: Install sshpass
       run: sudo apt-get install -y sshpass
@@ -98,6 +93,8 @@ jobs:
         # Restart Nginx
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S systemctl reload nginx"
 
+
+   
     - name: Deploy Tests to Server
       env:
         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
@@ -106,7 +103,8 @@ jobs:
       run: |
         # Ensure correct permissions on the target directory
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S mkdir -p /var/www/api/tests && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER /var/www/api/tests"        
-        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.API.Test/ $SSH_USER@$SSH_HOST:/var/www/api/tests
+        # sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.API.Test/ $SSH_USER@$SSH_HOST:/var/www/api/tests
+        sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./MajaMayo.API.Test/ $SSH_USER@$SSH_HOST:/var/www/api/tests
 
     
     - name: Run Tests on Server
