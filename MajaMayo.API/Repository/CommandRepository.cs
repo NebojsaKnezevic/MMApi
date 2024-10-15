@@ -118,7 +118,7 @@ namespace MajaMayo.API.Repository
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.Strict,
+                    SameSite = SameSiteMode.None,
                     Expires = DateTime.UtcNow.AddHours(12)
                 };
 
@@ -224,7 +224,12 @@ namespace MajaMayo.API.Repository
 
             var result = await _connection.ExecuteScalarAsync<bool>("spCookieLoginVerification", pars, commandType: CommandType.StoredProcedure);
 
-            if (result == true) return userDataFromCookie;
+            if (result == true)
+            {
+                var sql = " SELECT * FROM dbo.[User] WHERE Email = @Email AND Id = @Id;";
+                userDataFromCookie = await _connection.QuerySingleAsync<UserResponse>(sql, pars);
+                return userDataFromCookie;
+            }
             else throw new UnauthorizedAccessException("Something went wrong with cookie verification, please login again.");
 
             //var userDataFromDB = await _connection.
@@ -269,7 +274,7 @@ namespace MajaMayo.API.Repository
                 Expires = DateTime.UtcNow.AddDays(-1)
                 ,HttpOnly = true
                 ,Secure = true
-                ,SameSite = SameSiteMode.Strict
+                ,SameSite = SameSiteMode.None
             };
 
             _httpContext.HttpContext.Response.Cookies.Append(SecretTokenName, "", cookieOptions);

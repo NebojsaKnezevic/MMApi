@@ -5,6 +5,7 @@ namespace MajaMayo.API.Middlewares;
 
 public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
 {
+    
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -52,10 +53,7 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
             }
             else
             {
-
-
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
                 await context.Response.WriteAsync("An error occured while processing request.");
             }
         }

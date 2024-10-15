@@ -75,6 +75,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins("http://localhost:3000", "https://act.actrs.rs", "https://www.act.actrs.rs")
+
                   .AllowAnyMethod()
                   .AllowAnyHeader()
                   .AllowCredentials();
