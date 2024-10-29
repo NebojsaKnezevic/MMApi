@@ -4,5 +4,6 @@
     {
         public int AnswerId { get; set; }
         public bool IsSelected { get; set; }
+        public string? Text { get; set; }
     }
 }

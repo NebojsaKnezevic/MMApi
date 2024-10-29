@@ -5,5 +5,6 @@
         public int QuestionId { get; set; }
         public int HealthAssesmentId { get; set; }
         public List<AnswerSelectionType> Answers { get; set; }
+        //public string? AdditionalComment { get; set; }
     }
 }
