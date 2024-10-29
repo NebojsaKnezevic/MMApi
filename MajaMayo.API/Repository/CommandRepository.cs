@@ -251,16 +251,18 @@ namespace MajaMayo.API.Repository
 
             TVD.Columns.Add("AnswerId", typeof(int));
             TVD.Columns.Add("IsSelected", typeof(bool));
+            TVD.Columns.Add("Text", typeof(string));
 
             foreach (var answer in model.Answers)
             {
-                TVD.Rows.Add(answer.AnswerId, answer.IsSelected);
+                TVD.Rows.Add(answer.AnswerId, answer.IsSelected, answer.Text);
             }
 
             var pars = new DynamicParameters();
             pars.Add("@QuestionId", model.QuestionId, DbType.Int32);
             pars.Add("@HealthAssesmentId", model.HealthAssesmentId, DbType.Int32);
             pars.Add("@Answers", TVD.AsTableValuedParameter("dbo.AnswerSelectionType"));
+            //pars.Add("@AdditinalComment", model.AdditionalComment, DbType.String);
 
             var response = await _connection.ExecuteScalarAsync<bool>("dbo.spSubmitAnswers", pars, commandType: CommandType.StoredProcedure);
 
@@ -304,6 +306,8 @@ namespace MajaMayo.API.Repository
             parameters.Add("@PolicyNumber", user.PolicyNumber);
             parameters.Add("@JMBG", user.JMBG);
             parameters.Add("@PassportNumber", user.PassportNumber);
+            parameters.Add("@Height", user.Height);
+            parameters.Add("@Weight", user.Weight);
 
             var result = await _connection.ExecuteAsync("dbo.spFormUser", parameters, commandType: CommandType.StoredProcedure);
 

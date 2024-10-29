@@ -14,5 +14,8 @@
         public string? PolicyNumber { get; set; }
         public string? JMBG { get; set; }
         public string? PassportNumber { get; set; }
+        public int Height { get; set; }
+        public int Weight { get; set; }
+        //public int BMI { get; set; }
     }
 }
