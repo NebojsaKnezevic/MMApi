@@ -105,7 +105,7 @@ namespace MajaMayo.API.Controllers
         public async Task<IActionResult> CookieLoginUser() 
         {
             var result = await _sender.Send(new CookieLoginUserCommand());
-            return Ok(result);
+            return Ok(result.ToDTO());
         }
 
          [HttpPost("Command/CreateNewHealthAssesment/{userId:int}")]

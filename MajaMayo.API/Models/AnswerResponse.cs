@@ -9,5 +9,6 @@
         public bool IsActive { get; set; }
         public bool IsSelected { get; set; }
         public bool IsAnswered { get; set; }
+        public string? AdditionalComment { get; set; }
     }
 }

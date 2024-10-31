@@ -16,6 +16,8 @@
         public string? PassportNumber { get; set; }
         public int Height { get; set; }
         public int Weight { get; set; }
+        public byte[]? PasswordHash { get; set; }
+        public byte[]? PasswordSalt { get; set; }
         //public int BMI { get; set; }
     }
 }
