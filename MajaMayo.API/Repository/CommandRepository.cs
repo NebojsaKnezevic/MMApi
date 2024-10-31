@@ -5,6 +5,7 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using MajaMayo.API.ConfigModel;
 using MajaMayo.API.DTOs;
+using MajaMayo.API.Helpers;
 using MajaMayo.API.Models;
 using MajaMayo.API.Models.Survey.Command.User;
 using Microsoft.AspNetCore.Identity;
@@ -47,8 +48,11 @@ namespace MajaMayo.API.Repository
         }
         public async Task<bool> RegisterUser(string Email, string Pwd)
         {
-            Pwd = Security.Encrypt(_securitySettings.SecurityKey, Pwd);
-            var pars = new { Email = Email, Pwd = Pwd };
+            //Pwd = Security.Encrypt(_securitySettings.SecurityKey, Pwd);
+            byte[] passwordHash;
+            byte[] passwordSalt;
+            PasswordHash.CreatePasswordHash(Pwd, out passwordHash, out passwordSalt);
+            var pars = new { Email = Email, Pwd =Pwd, PwdHash = passwordHash, PwdSalt = passwordSalt };
             var result = await _connection.ExecuteScalarAsync<bool>("spRegisterUser", pars, commandType: CommandType.StoredProcedure);
             if (!result) throw new Exception("Email already exists!");
 
@@ -109,9 +113,15 @@ namespace MajaMayo.API.Repository
         {
             try
             {
-                Pwd = Security.Encrypt(_securitySettings.SecurityKey, Pwd);
-                var pars = new { Email = Email, Pwd = Pwd };
+                //Pwd = Security.Encrypt(_securitySettings.SecurityKey, Pwd);
+ 
+                var pars = new { Email = Email };
                 var result = await _connection.QuerySingleAsync<UserResponse>("spLoginUser", pars, commandType: CommandType.StoredProcedure);
+
+                var isVerified = PasswordHash.VerifyPasswordHash(Pwd, result.PasswordHash, result.PasswordSalt);
+
+                if (!isVerified) throw new Exception("Incorrect password"); 
+
                 var tokenString = GenerateJWTToken(result);
 
                 var cookieOptions = new CookieOptions

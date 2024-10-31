@@ -13,6 +13,16 @@ namespace MajaMayo.API.Mapper
                 Email = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
+                DateOfBirth = model.DateOfBirth,
+                Gender = model.Gender,
+                Height = model.Height,
+                JMBG = model.JMBG,
+                PassportNumber = model.PassportNumber,
+                Password = model.Password,
+                PhoneNumber = model.PhoneNumber,
+                PolicyNumber = model.PolicyNumber,
+                RegisteredOn = model.RegisteredOn,
+                Weight = model.Weight,
             };
         }
     }
