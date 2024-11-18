@@ -52,7 +52,7 @@ namespace MajaMayo.API.Repository
             byte[] passwordHash;
             byte[] passwordSalt;
             PasswordHash.CreatePasswordHash(Pwd, out passwordHash, out passwordSalt);
-            var pars = new { Email = Email, Pwd =Pwd, PwdHash = passwordHash, PwdSalt = passwordSalt };
+            var pars = new { Email = Email, PwdHash = passwordHash, PwdSalt = passwordSalt };
             var result = await _connection.ExecuteScalarAsync<bool>("spRegisterUser", pars, commandType: CommandType.StoredProcedure);
             if (!result) throw new Exception("Email already exists!");
 
@@ -340,6 +340,16 @@ namespace MajaMayo.API.Repository
 
             var result = await _connection.ExecuteAsync("dbo.spInsertUpdateFamilyHistory", pars, commandType: CommandType.StoredProcedure);
 
+            return result > 0;
+        }
+
+        public async Task<bool> CompleteSurvey(int healthHssesmentId)
+        {
+            var pars = new DynamicParameters();
+
+            pars.Add("@HealthAssesmentId", healthHssesmentId, DbType.Int32);
+
+            var result = await _connection.ExecuteAsync("dbo.spCompleteSurvey", pars, commandType: CommandType.StoredProcedure);
             return result > 0;
         }
     }

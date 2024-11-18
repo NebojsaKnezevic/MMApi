@@ -18,7 +18,7 @@ namespace MajaMayo.API.Mapper
                 Height = model.Height,
                 JMBG = model.JMBG,
                 PassportNumber = model.PassportNumber,
-                Password = model.Password,
+                //Password = model.Password,
                 PhoneNumber = model.PhoneNumber,
                 PolicyNumber = model.PolicyNumber,
                 RegisteredOn = model.RegisteredOn,

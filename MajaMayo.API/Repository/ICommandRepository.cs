@@ -17,5 +17,7 @@ namespace MajaMayo.API.Repository
 
         Task<bool> UpdateUserData(UserResponse user);
         Task<bool> InsertUpdateFamilyHistory(FamilyHistoryModel model);
+
+        Task<bool> CompleteSurvey(int healthHssesmentId);
     }
 }
