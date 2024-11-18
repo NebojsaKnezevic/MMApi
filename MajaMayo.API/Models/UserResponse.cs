@@ -9,7 +9,7 @@
         public string? PhoneNumber { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string? Gender { get; set; }
-        public string? Password { get; set; }
+        //public string? Password { get; set; }
         public DateTime RegisteredOn { get; set; }
         public string? PolicyNumber { get; set; }
         public string? JMBG { get; set; }
