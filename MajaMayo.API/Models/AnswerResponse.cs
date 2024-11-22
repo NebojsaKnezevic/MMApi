@@ -10,5 +10,6 @@
         public bool IsSelected { get; set; }
         public bool IsAnswered { get; set; }
         public string? AdditionalComment { get; set; }
+        public int? ParentId { get; set; }
     }
 }
