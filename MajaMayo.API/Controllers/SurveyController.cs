@@ -178,5 +178,12 @@ namespace MajaMayo.API.Controllers
             return Ok(result);
         }
 
+        [HttpPut("Command/CompleteSurvey/{id:int}")]
+        public async Task<IActionResult> CompleteSurvey(int id) 
+        {
+            var result = await _sender.Send(new CompleteSurveyCommand() { haid = id });
+            return Ok(result);
+        }
+
     }
 }
