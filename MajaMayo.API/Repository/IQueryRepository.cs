@@ -17,7 +17,7 @@ namespace MajaMayo.API.Repository
 
         Task<FamilyHistoryModel> GetFamilyHistory(int id);
 
-
+        Task<ICollection<HealthExaminationResponse>> GetHealthExaminations();
 
     }
 }

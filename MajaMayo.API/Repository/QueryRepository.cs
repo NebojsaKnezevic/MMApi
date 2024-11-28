@@ -67,5 +67,11 @@ namespace MajaMayo.API.Repository
             var response = await _context.QueryFirstAsync<FamilyHistoryModel>("spGetFamilyHistory", pars, commandType: CommandType.StoredProcedure);
             return response;
         }
+
+        public async Task<ICollection<HealthExaminationResponse>> GetHealthExaminations()
+        {
+            var response = await _context.QueryAsync<HealthExaminationResponse>("spGetHealthExaminations", null,commandType: CommandType.StoredProcedure);
+            return response.ToList();
+        }
     }
 }
