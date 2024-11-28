@@ -11,5 +11,6 @@
         public bool IsAnswered { get; set; }
         public string? AdditionalComment { get; set; }
         public int? ParentId { get; set; }
+        public int Score { get; set; }
     }
 }

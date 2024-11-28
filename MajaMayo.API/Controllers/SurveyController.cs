@@ -29,6 +29,8 @@ using MajaMayo.API.Models.Survey.Command.FamilyHistory;
 using MajaMayo.API.Models.Survey.Query.FamilyHistory;
 using Microsoft.Extensions.Options;
 using MajaMayo.API.ConfigModel;
+using System.Net.WebSockets;
+using MajaMayo.API.Models.Survey.Query.HealthExaminations;
 
 namespace MajaMayo.API.Controllers
 {
@@ -183,6 +185,12 @@ namespace MajaMayo.API.Controllers
         {
             var result = await _sender.Send(new CompleteSurveyCommand() { haid = id });
             return Ok(result);
+        }
+        [HttpGet("Query/GetHealthExaminations")]
+        public async Task<IActionResult> GetHealthExaminations()
+        {
+            var result = await _sender.Send(new GetHealthExaminationsQuery());
+            return Ok(result.ToList());
         }
 
     }
