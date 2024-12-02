@@ -3,7 +3,7 @@ using MediatR;
 
 namespace MajaMayo.API.Models.Survey.Query.HealthAssesment
 {
-    public class GetHealthAssesmentHandler : IRequestHandler<GetHealthAssesmentQuery, HealthAssesmentResponse>
+    public class GetHealthAssesmentHandler : IRequestHandler<GetHealthAssesmentQuery, ICollection<HealthAssesmentResponse>>
     {
         private readonly IQueryRepository _repository;
 
@@ -11,7 +11,7 @@ namespace MajaMayo.API.Models.Survey.Query.HealthAssesment
         {
             _repository = repository;
         }
-        public async Task<HealthAssesmentResponse> Handle(GetHealthAssesmentQuery request, CancellationToken cancellationToken)
+        public async Task<ICollection<HealthAssesmentResponse>> Handle(GetHealthAssesmentQuery request, CancellationToken cancellationToken)
         {
             var result = await _repository.GetHealthAssesment(request.UserId, request.HealthAssesmentId);
             return result;

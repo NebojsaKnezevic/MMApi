@@ -50,14 +50,14 @@ namespace MajaMayo.API.Repository
             return response.ToList();
         }
 
-        public async Task<HealthAssesmentResponse> GetHealthAssesment(int userId, int healthAssesmentId = 0)
+        public async Task<ICollection<HealthAssesmentResponse>> GetHealthAssesment(int userId, int healthAssesmentId = 0)
         {
             var pars = new DynamicParameters();
             pars.Add("@UserId", userId, DbType.Int32);
             pars.Add("@HealthAssesmentId", healthAssesmentId, DbType.Int32);
 
-            var response = await _context.QuerySingleAsync<HealthAssesmentResponse>("spGetHealthAssesment", pars, commandType: CommandType.StoredProcedure);
-            return response;
+            var response = await _context.QueryAsync<HealthAssesmentResponse>("spGetHealthAssesment", pars, commandType: CommandType.StoredProcedure);
+            return response.ToList();
         }
 
         public async Task<FamilyHistoryModel> GetFamilyHistory(int id)
