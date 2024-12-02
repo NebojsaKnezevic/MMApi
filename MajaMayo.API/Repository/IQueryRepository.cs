@@ -13,7 +13,7 @@ namespace MajaMayo.API.Repository
  
         Task<ICollection<AnswerResponse>> GetAnswers(int userId, int healthAssesmentId);
 
-        Task<HealthAssesmentResponse> GetHealthAssesment(int userId, int healthAssesmentId = 0);
+        Task<ICollection<HealthAssesmentResponse>> GetHealthAssesment(int userId, int healthAssesmentId = 0);
 
         Task<FamilyHistoryModel> GetFamilyHistory(int id);
 
