@@ -163,7 +163,7 @@ namespace MajaMayo.API.Repository
             new Claim(ClaimTypes.Email, user.Email),
             //new Claim(ClaimTypes.Gender, user.Gender),
             new Claim(ClaimTypes.GivenName, user.FirstName + user.LastName),
-            new Claim(ClaimTypes.Role, "Admin")
+            new Claim(ClaimTypes.Role, user.Role)
             };
 
             var jwtToken = new JwtSecurityToken(
