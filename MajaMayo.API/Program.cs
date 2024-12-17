@@ -109,6 +109,15 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("Cross-Origin-Opener-Policy", "unsafe-none");
+    context.Response.Headers.Add("Cross-Origin-Embedder-Policy", "unsafe-none");
+    await next();
+});
+
+
+
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseSerilogRequestLogging(options =>
