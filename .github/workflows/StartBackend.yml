@@ -1,0 +1,48 @@
+name: Start backend server
+
+on:
+  workflow_dispatch
+  #push:
+    #branches:
+      #- main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Start app on Server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+          echo "$SSH_PASSWORD" | sudo -S bash -c 'cd /var/www/api/html && dotnet MajaMayo.API.dll &'
+        "
+
+            
+    - name: Run Tests on Server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+          source /etc/profile
+          export DOTNET_ROOT=/usr/local/share/dotnet
+          export PATH=\$PATH:/usr/local/share/dotnet:/usr/local/share/dotnet/tools
+          cd /var/www/api/tests  
+          dotnet test --no-build --verbosity normal
+        "
+
+        
+    
+    
+    
+
+
+
+        
+
