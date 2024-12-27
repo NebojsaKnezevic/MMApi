@@ -56,7 +56,7 @@ namespace MajaMayo.API.Repository
             pars.Add("@UserId", userId, DbType.Int32);
             pars.Add("@HealthAssesmentId", healthAssesmentId, DbType.Int32);
 
-            var response = await _context.QueryAsync<HealthAssesmentResponse>("spGetHealthAssesment", pars, commandType: CommandType.StoredProcedure);
+            var response = await _context.QueryAsync<HealthAssesmentResponse>("spGetHealthAssessment", pars, commandType: CommandType.StoredProcedure);
             return response.ToList();
         }
 

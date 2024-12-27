@@ -1,6 +1,7 @@
 ﻿
 using ACT.Security.Service;
 using Dapper;
+using Google.Apis.Auth;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MajaMayo.API.ConfigModel;
@@ -154,6 +155,58 @@ namespace MajaMayo.API.Repository
             
         }
 
+        public async Task<UserResponse> GoogleLogin(GoogleLoginResponse googleResponse)
+        {
+            UserResponse? result = null;
+
+            //Potvrdi google token
+            try
+            {
+                var payload = await GoogleJsonWebSignature.ValidateAsync(googleResponse.Credential);
+
+
+               
+                //izvuci potrebne informacije credentials
+
+                if (payload is not null) 
+                {
+                    DynamicParameters pars = new DynamicParameters();
+                    pars.Add("@Email", payload.Email, DbType.String);
+                    pars.Add("@FirstName", payload.GivenName, DbType.String);
+                    pars.Add("@LastName", payload.FamilyName, DbType.String);
+                    pars.Add("@VerifiedEmail", payload.EmailVerified, DbType.Boolean);
+
+                    result = await _connection.QueryFirstOrDefaultAsync<UserResponse>("spGoogleLoginUser", pars, commandType: CommandType.StoredProcedure);
+
+                    var tokenString = GenerateJWTToken(result);
+
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        Expires = DateTime.UtcNow.AddHours(12)
+                    };
+
+                    _httpContext.HttpContext.Response.Cookies.Append(SecretTokenName, tokenString, cookieOptions);
+                    var sql = "SELECT * FROM [MajaMayo].[dbo].[User] WHERE Email = @Email";
+                    var product = await _connection.QuerySingleAsync<UserResponse>(sql, new { Email = payload.Email });
+                    result = product;
+                }
+
+                //ako user nije u bazi, zavedi ga u suportnom povuci njegove podatke iz baze.
+            }
+            catch (Exception)
+            {
+                throw new Exception("Unauthorized try to log in");
+            }
+            
+
+            
+
+            return result;
+        }
+
         private string GenerateJWTToken(UserResponse user)
         {
             var claims = new List<Claim> {
@@ -251,7 +304,7 @@ namespace MajaMayo.API.Repository
         {
             DynamicParameters pars = new DynamicParameters();
             pars.Add("@UserId", userId, DbType.Int32, ParameterDirection.Input);
-            var result = await _connection.QuerySingleAsync<HealthAssesmentResponse>("spCreateNewAssesment", pars, commandType:CommandType.StoredProcedure);
+            var result = await _connection.QuerySingleAsync<HealthAssesmentResponse>("spCreateNewAssessment", pars, commandType:CommandType.StoredProcedure);
             return result;
         }
 
@@ -352,5 +405,7 @@ namespace MajaMayo.API.Repository
             var result = await _connection.ExecuteAsync("dbo.spCompleteSurvey", pars, commandType: CommandType.StoredProcedure);
             return result > 0;
         }
+
+        
     }
 }

@@ -47,7 +47,7 @@ namespace MajaMayo.API.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        [Authorize(Roles = "admin,user")]
+        //[Authorize(Roles = "admin,user")]
         [HttpGet("Query/GetQuestions")]
         public async Task<IActionResult> GetQuestions()
         {
@@ -61,7 +61,7 @@ namespace MajaMayo.API.Controllers
         //    var res = await _sender.Send(new GetQuestionsByEmailQuery(email));
         //    return Ok(res);
         //}
-        [Authorize(Roles = "admin,user")]
+        //[Authorize(Roles = "admin,user")]
         [HttpGet("Query/GetQiestionGroups")]
         public async Task<IActionResult> GetQuestionGroups() 
         {
@@ -70,14 +70,14 @@ namespace MajaMayo.API.Controllers
             var result = await _sender.Send(new GetQuestionGroupsQuery());
             return Ok(result);
         }
-        [Authorize(Roles = "admin,user")]
+        //[Authorize(Roles = "admin,user")]
         [HttpGet("Query/GetAnswers")]
         public async Task<IActionResult> GetAnswers([FromQuery]GetAnswersQuery query) 
         {
             var result = await _sender.Send(query);
             return Ok(result);
         }
-        [Authorize(Roles = "admin,user")]
+        //[Authorize(Roles = "admin,user")]
         [HttpGet("Query/GetHealthAssesment")]
         public async Task<IActionResult> GetHealthAssesment([FromQuery] int userId, [FromQuery] int healthAssesmentId)
         {
@@ -199,9 +199,8 @@ namespace MajaMayo.API.Controllers
         [HttpPost("Command/GoogleLogin")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginResponse googleLoginResponse) 
         {
-           
-            var x = googleLoginResponse;
-            return Ok(new { x="success" });
+            var result = await _sender.Send(new GoogleLoginCommand() { ClientId = googleLoginResponse.ClientId, Credential = googleLoginResponse.Credential});
+            return Ok(result);
         }
     }
 }
