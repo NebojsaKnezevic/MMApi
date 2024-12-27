@@ -12,17 +12,20 @@ jobs:
 
     steps:
 
-    - name: Start app on Server
+
+    - name: Restart Ubuntu server
       env:
         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         SSH_HOST: ${{ secrets.SSH_HOST }}
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
-          echo "$SSH_PASSWORD" | sudo -S bash -c 'cd /var/www/api/html && dotnet MajaMayo.API.dll &'
+          echo "$SSH_PASSWORD" | sudo -S reboot
         "
+    
+    - name: Wait for server to restart
+      run: sleep 60
 
-            
     - name: Run Tests on Server
       env:
         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
@@ -36,6 +39,19 @@ jobs:
           cd /var/www/api/tests  
           dotnet test --no-build --verbosity normal
         "
+      
+    - name: Start app on Server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+          echo "$SSH_PASSWORD" | sudo -S bash -c 'cd /var/www/api/html && dotnet MajaMayo.API.dll  > app.log 2>&1 &'
+        "
+
+            
+    
 
         
     
