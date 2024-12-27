@@ -28,11 +28,16 @@ jobs:
     steps:
     - name: Wait for server to restart
       run: |
+        echo "Waiting for server to restart..."
         sleep 60
-        while ! nc -z ${{ secrets.SSH_HOST }} 22; do   
-          sleep 1
+        for i in {1..30}; do
+          if nc -z ${{ secrets.SSH_HOST }} 22; then
+            echo "Server is back online."
+            break
+          fi
+          echo "Server is not online yet. Retrying in 10 seconds..."
+          sleep 10
         done
-        sleep 10
         
 
     - name: Run Tests on Server
