@@ -19,7 +19,7 @@ jobs:
       run: |
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
           echo "$SSH_PASSWORD" | sudo -S reboot -f
-        "
+        " || true
 
   wait-and-continue:
     runs-on: ubuntu-latest
