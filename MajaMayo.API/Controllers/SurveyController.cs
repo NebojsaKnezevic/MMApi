@@ -195,5 +195,12 @@ namespace MajaMayo.API.Controllers
             return Ok(result.ToList());
         }
 
+
+        [HttpPost("Command/GoogleLogin")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginResponse googleLoginResponse) 
+        {
+            var result = await _sender.Send(new GoogleLoginCommand() { ClientId = googleLoginResponse.ClientId, Credential = googleLoginResponse.Credential});
+            return Ok(result);
+        }
     }
 }

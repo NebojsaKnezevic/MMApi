@@ -78,6 +78,7 @@ builder.Services.AddCors(options =>
 
                   .AllowAnyMethod()
                   .AllowAnyHeader()
+                  //.AllowAnyOrigin()
                   .AllowCredentials();
         });
 });
@@ -105,9 +106,26 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = false,
         ClockSkew = TimeSpan.FromMinutes(5)
     };
-});
+})
+.AddGoogle(googleOptions =>
+{
+    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+}); ;
+
+
 
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Cross-Origin-Opener-Policy"] = "unsafe-none";
+    //context.Response.Headers.Remove("Cross-Origin-Opener-Policy");
+
+    context.Response.Headers["Cross-Origin-Embedder-Policy"] = "unsafe-none";
+    await next();
+
+});
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 

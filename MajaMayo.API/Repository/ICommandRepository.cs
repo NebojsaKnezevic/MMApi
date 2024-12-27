@@ -19,5 +19,7 @@ namespace MajaMayo.API.Repository
         Task<bool> InsertUpdateFamilyHistory(FamilyHistoryModel model);
 
         Task<bool> CompleteSurvey(int healthHssesmentId);
+
+        Task<UserResponse> GoogleLogin(GoogleLoginResponse googleResponse);
     }
 }
