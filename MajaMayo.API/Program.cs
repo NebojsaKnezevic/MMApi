@@ -119,15 +119,17 @@ builder.Services.AddAuthentication(options =>
 })
 .AddGoogle(googleOptions =>
 {
-    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    googleOptions.ClientId =  builder.Configuration["Authentication:Google:ClientId"];
+    googleOptions.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET") ?? builder.Configuration["Authentication:Google:ClientSecret"];
 })
 ; 
 
 
 
 var app = builder.Build(); 
+  
 
+//dsadasdasasdas
 //app.Use(async (context, next) =>
 //{
 //    context.Response.Headers["Cross-Origin-Opener-Policy"] = "unsafe-none";

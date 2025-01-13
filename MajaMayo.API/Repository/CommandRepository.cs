@@ -411,7 +411,7 @@ namespace MajaMayo.API.Repository
         {
             var pars = new DynamicParameters();
             pars.Add("@LogLevel", logEntry.LogLevel);
-            pars.Add("@Message", logEntry.Message);
+            pars.Add("@Message", logEntry.Message, DbType.String);
             pars.Add("@Exception", logEntry.Exception);
             pars.Add("@EventId", logEntry.EventId);
             pars.Add("@Source", logEntry.Source);
