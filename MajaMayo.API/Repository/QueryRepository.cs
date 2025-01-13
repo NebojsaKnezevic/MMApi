@@ -1,9 +1,11 @@
 ﻿using Dapper;
 using MajaMayo.API.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using System.Data.Common;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using static MajaMayo.API.Models.CommonResponseObject;
