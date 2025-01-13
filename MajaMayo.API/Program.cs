@@ -127,7 +127,9 @@ builder.Services.AddAuthentication(options =>
 
 
 var app = builder.Build(); 
+  
 
+//dsadasdasasdas
 //app.Use(async (context, next) =>
 //{
 //    context.Response.Headers["Cross-Origin-Opener-Policy"] = "unsafe-none";
