@@ -67,11 +67,13 @@ jobs:
         DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
         SECURITY_KEY: ${{ secrets.SECURITY_KEY }}
         SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       run: |
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
            echo '$SSH_PASSWORD' | sudo -S bash -c 'echo \"DB_CONNECTION_STRING=$DB_CONNECTION_STRING\" >> /etc/environment'
            echo '$SSH_PASSWORD' | sudo -S bash -c 'echo \"SECURITY_KEY=$SECURITY_KEY\" >> /etc/environment'
            echo '$SSH_PASSWORD' | sudo -S bash -c 'echo \"SMTP_PASSWORD=$SMTP_PASSWORD\" >> /etc/environment'
+           echo '$SSH_PASSWORD' | sudo -S bash -c 'echo \"GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET\" >> /etc/environment'
         "
         
     - name: Deploy to Server
