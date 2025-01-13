@@ -4,13 +4,17 @@ using MajaMayo.API.Repository;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
+
+
+
+var   builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddLogging();
@@ -111,21 +115,22 @@ builder.Services.AddAuthentication(options =>
 {
     googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
     googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-}); ;
+})
+; 
 
 
 
-var app = builder.Build();
+var app = builder.Build(); 
 
-app.Use(async (context, next) =>
-{
-    context.Response.Headers["Cross-Origin-Opener-Policy"] = "unsafe-none";
-    //context.Response.Headers.Remove("Cross-Origin-Opener-Policy");
+//app.Use(async (context, next) =>
+//{
+//    context.Response.Headers["Cross-Origin-Opener-Policy"] = "unsafe-none";
+//    //context.Response.Headers.Remove("Cross-Origin-Opener-Policy");
 
-    context.Response.Headers["Cross-Origin-Embedder-Policy"] = "unsafe-none";
-    await next();
+//    context.Response.Headers["Cross-Origin-Embedder-Policy"] = "unsafe-none";
+//    await next();
 
-});
+//});
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
