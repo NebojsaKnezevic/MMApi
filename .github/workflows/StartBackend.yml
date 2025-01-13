@@ -61,7 +61,9 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
-          echo "$SSH_PASSWORD" | sudo -S bash -c 'cd /var/www/api/html && nohup dotnet MajaMayo.API.dll  > app.log 2>&1 &'
+          echo \"$SSH_PASSWORD\" | sudo -S bash -c '
+            cd /var/www/api/html && nohup dotnet MajaMayo.API.dll > app.log 2>&1 &
+          ' && disown
         "
 
             
