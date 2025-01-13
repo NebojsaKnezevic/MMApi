@@ -16,6 +16,12 @@ using System.Text;
 
 var   builder = WebApplication.CreateBuilder(args);
 
+//var logger = new LoggerConfiguration()
+//    .WriteTo.Console()
+//    .WriteTo.MSSqlServer(
+//        connectionString: "YourDatabaseConnectionString",
+//        sinkOptions: new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
+//    .CreateLogger();
 
 builder.Services.AddLogging();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);

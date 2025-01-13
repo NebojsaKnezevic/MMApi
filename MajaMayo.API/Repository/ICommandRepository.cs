@@ -21,5 +21,7 @@ namespace MajaMayo.API.Repository
         Task<bool> CompleteSurvey(int healthHssesmentId);
 
         Task<UserResponse> GoogleLogin(GoogleLoginResponse googleResponse);
+
+        Task<bool> LogError(LogEntry logEntry);
     }
 }

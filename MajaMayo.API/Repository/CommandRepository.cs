@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MimeKit;
 using System.Data;
+using System.Data.SqlClient;
 using System.IdentityModel.Tokens.Jwt;
 
 using System.Security.Claims;
@@ -406,6 +407,20 @@ namespace MajaMayo.API.Repository
             return result > 0;
         }
 
+        public async Task<bool> LogError(LogEntry logEntry)
+        {
+            var pars = new DynamicParameters();
+            pars.Add("@LogLevel", logEntry.LogLevel);
+            pars.Add("@Message", logEntry.Message);
+            pars.Add("@Exception", logEntry.Exception);
+            pars.Add("@EventId", logEntry.EventId);
+            pars.Add("@Source", logEntry.Source);
+            pars.Add("@RequestPath", logEntry.RequestPath);
+            pars.Add("@UserId", logEntry.UserId);
+
+            var result = await _connection.ExecuteAsync("dbo.spInsertLog", pars, commandType: CommandType.StoredProcedure);
+            return result > 0; 
+        }
         
     }
 }
