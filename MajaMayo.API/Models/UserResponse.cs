@@ -19,6 +19,7 @@
         public byte[]? PasswordHash { get; set; }
         public byte[]? PasswordSalt { get; set; }
         public string? Role { get; set; }
+        public int HealthAssessmentId { get; set; }
         //public int BMI { get; set; }
     }
 }

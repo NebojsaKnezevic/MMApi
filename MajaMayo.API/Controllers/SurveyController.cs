@@ -31,6 +31,7 @@ using Microsoft.Extensions.Options;
 using MajaMayo.API.ConfigModel;
 using System.Net.WebSockets;
 using MajaMayo.API.Models.Survey.Query.HealthExaminations;
+using MajaMayo.API.Models.Survey.Query.HealthAssessmentScore;
 
 namespace MajaMayo.API.Controllers
 {
@@ -201,6 +202,14 @@ namespace MajaMayo.API.Controllers
         {
             var result = await _sender.Send(new GoogleLoginCommand() { ClientId = googleLoginResponse.ClientId, Credential = googleLoginResponse.Credential});
             return Ok(result);
+        }
+
+        [HttpGet("Query/GetHealthAssessmentScores/{healthAssessmentId:int}")]
+        public async Task<IActionResult> GetHealthAssessmentScores(int healthAssessmentId) 
+        {
+            var result = await _sender.Send(new GetHealthAssessmentScoresQuery() { HealthAssessmentId = healthAssessmentId });
+            return Ok(result);  
+
         }
     }
 }

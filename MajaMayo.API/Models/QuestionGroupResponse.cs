@@ -20,6 +20,8 @@
         public int OrderNo { get; set; }
         public bool IsAnswered { get; set; }
 
+        public string? Description { get; set; }
+
         public QuestionGroupResponse()
         {
             Questions = new List<QuestionResponse>();

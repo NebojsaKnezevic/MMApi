@@ -19,5 +19,7 @@ namespace MajaMayo.API.Repository
 
         Task<ICollection<HealthExaminationResponse>> GetHealthExaminations();
 
+        Task<ICollection<HealthAssessmentScoresResponse>> GetHealthAssessmentScores(int healthAssessmentId);
+
     }
 }
