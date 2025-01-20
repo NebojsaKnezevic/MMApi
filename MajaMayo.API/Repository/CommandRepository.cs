@@ -364,14 +364,15 @@ namespace MajaMayo.API.Repository
             parameters.Add("@FirstName", user.FirstName);
             parameters.Add("@LastName", user.LastName);
             //parameters.Add("@Email", user.Email);
-            parameters.Add("@PhoneNumber", user.PhoneNumber);
+            //parameters.Add("@PhoneNumber", user.PhoneNumber);
             parameters.Add("@DateOfBirth", user.DateOfBirth);
             parameters.Add("@Gender", user.Gender);
-            parameters.Add("@PolicyNumber", user.PolicyNumber);
-            parameters.Add("@JMBG", user.JMBG);
-            parameters.Add("@PassportNumber", user.PassportNumber);
+            //parameters.Add("@PolicyNumber", user.PolicyNumber);
+            //parameters.Add("@JMBG", user.JMBG);
+            //parameters.Add("@PassportNumber", user.PassportNumber);
             parameters.Add("@Height", user.Height);
             parameters.Add("@Weight", user.Weight);
+            parameters.Add("@HealthAssesmentId", user.HealthAssessmentId);
 
             var result = await _connection.ExecuteAsync("dbo.spFormUser", parameters, commandType: CommandType.StoredProcedure);
 

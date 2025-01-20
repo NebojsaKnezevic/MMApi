@@ -65,7 +65,9 @@ namespace MajaMayo.API.Repository
         public async Task<FamilyHistoryModel> GetFamilyHistory(int id)
         {
             var pars = new DynamicParameters();
+
             pars.Add("@Id",id, DbType.Int32);
+
             var response = await _context.QueryFirstAsync<FamilyHistoryModel>("spGetFamilyHistory", pars, commandType: CommandType.StoredProcedure);
             return response;
         }
@@ -73,6 +75,16 @@ namespace MajaMayo.API.Repository
         public async Task<ICollection<HealthExaminationResponse>> GetHealthExaminations()
         {
             var response = await _context.QueryAsync<HealthExaminationResponse>("spGetHealthExaminations", null,commandType: CommandType.StoredProcedure);
+            return response.ToList();
+        }
+
+        public async Task<ICollection<HealthAssessmentScoresResponse>> GetHealthAssessmentScores(int healthAssessmentId)
+        {
+            var pars = new DynamicParameters();
+
+            pars.Add("@HealthAssessmentId", healthAssessmentId, DbType.Int32);
+
+            var response = await _context.QueryAsync<HealthAssessmentScoresResponse>("dbo.spGetHealthAssessmentScores", pars, commandType: CommandType.StoredProcedure);
             return response.ToList();
         }
     }
