@@ -75,6 +75,8 @@ builder.Services.Configure<EmailSettings>(options =>
 
 builder.Services.AddScoped<IQueryRepository, QueryRepository>();
 builder.Services.AddScoped<ICommandRepository, CommandRepository>();
+builder.Services.AddScoped<IDGCommandRepository, DGCommandRepository>();
+
 builder.Services.AddMediatR(config => 
 {
     config.RegisterServicesFromAssembly(typeof(Program).Assembly);
