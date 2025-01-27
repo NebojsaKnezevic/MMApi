@@ -41,6 +41,6 @@ jobs:
 
     - name: Push new branch to GitHub
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
       run: |
         git push origin FolderBackup-branch
