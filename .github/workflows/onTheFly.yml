@@ -18,7 +18,7 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
 
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "ls -lR /var"
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "ls -lR /var/opt/mssql/data"
 
     - name: Print environment variables on remote server
       env:
