@@ -67,7 +67,15 @@ namespace MajaMayo.API.Middlewares
                 else
                 {
                     // For non-JSON responses, keep the original response body as is
-                    jsonResponse = responseBodyText;
+                    var apiResponse = new ApiResponse
+                    {
+                        Data = responseBodyText,
+                        IsSuccess = context.Response.StatusCode >= 200 && context.Response.StatusCode < 300,
+                        StatusCode = context.Response.StatusCode,
+                        Message = message ?? "No message"
+                    };
+                    jsonResponse = JsonSerializer.Serialize(apiResponse);
+                    //jsonResponse = responseBodyText;
                 }
 
                 // Write the modified response back to the original stream

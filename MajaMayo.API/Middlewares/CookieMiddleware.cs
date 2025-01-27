@@ -12,9 +12,12 @@
 
             public async Task InvokeAsync(HttpContext context)
             {
-                if (context.Request.Cookies.TryGetValue("ACTTokenAuth", out var token))
+                if (context.Request.Path.HasValue && context.Request.Path.Value.Contains("/Survey", StringComparison.OrdinalIgnoreCase))
                 {
-                    context.Request.Headers["Authorization"] = $"Bearer {token}";
+                    if (context.Request.Cookies.TryGetValue("ACTTokenAuth", out var token))
+                    {
+                        context.Request.Headers["Authorization"] = $"Bearer {token}";
+                    }
                 }
 
                 await _next(context);

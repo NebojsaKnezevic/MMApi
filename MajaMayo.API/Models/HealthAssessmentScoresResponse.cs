@@ -6,5 +6,6 @@
         public int HealthAssessmentId { get; set; }
         public string HealthAssessment { get; set; }
         public int Score { get; set; }
+        public string Description { get; set; }
     }
 }
