@@ -28,7 +28,7 @@ jobs:
         SSH_HOST: ${{ secrets.SSH_HOST }}
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
-        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST:/var/www/MajaMayo20250127.bak ./FolderBackup
+        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST:/var/www/api/MajaMayo20250127.bak ./FolderBackup
 
     - name: Create new branch
       run: |
