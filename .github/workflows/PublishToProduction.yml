@@ -7,7 +7,7 @@ on:
       #- main
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -94,9 +94,7 @@ jobs:
         # Clear Nginx cache
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S rm -rf /var/cache/nginx/*"
         
-        # Restart Nginx
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S systemctl reload nginx"
-
+       
     - name: Deploy Tests to Server
       env:
         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
@@ -105,8 +103,40 @@ jobs:
       run: |
         sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.Tests/ $SSH_USER@$SSH_HOST:/var/www/api/tests
 
+  
+  reboot-server:
+    runs-on: ubuntu-latest
 
-    
+    steps:
+    - name: Force Restart Ubuntu server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+          echo "$SSH_PASSWORD" | sudo -S reboot -f
+        " || true
+
+  wait-and-continue:
+    runs-on: ubuntu-latest
+    needs: reboot-server
+
+    steps:
+    - name: Wait for server to restart
+      run: |
+        echo "Waiting for server to restart..."
+        sleep 60
+        for i in {1..30}; do
+          if nc -z ${{ secrets.SSH_HOST }} 22; then
+            echo "Server is back online."
+            break
+          fi
+          echo "Server is not online yet. Retrying in 10 seconds..."
+          sleep 10
+        done
+        
+
     - name: Run Tests on Server
       env:
         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
@@ -114,19 +144,24 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
-          source ~/.bashrc
-          cd /var/www/api/tests
-          dotnet test
+          source /etc/profile
+          export DOTNET_ROOT=/usr/local/share/dotnet
+          export PATH=\$PATH:/usr/local/share/dotnet:/usr/local/share/dotnet/tools
+          cd /var/www/api/tests  
+          dotnet test --no-build --verbosity normal
         "
-        
-    - name: Start app on Server and continue
+      
+    - name: Start app on Server
       env:
         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         SSH_HOST: ${{ secrets.SSH_HOST }}
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
-          echo "$SSH_PASSWORD" | sudo -S bash -c 'cd /var/www/api/html && nohup dotnet MajaMayo.API.dll &'
+          echo \"$SSH_PASSWORD\" | sudo -S bash -c '
+            cd /var/www/api/html && nohup dotnet MajaMayo.API.dll > app.log 2>&1 &
+          ' >/dev/null 2>&1 &
+          exit
         "
         
 
