@@ -22,13 +22,9 @@ namespace MajaMayo.API.Controllers
         [HttpPost("RegisterDGUsers")]
         public async Task<IActionResult> RegisterDGUsers([FromBody] List<DGApprovedUserResponse> dGApproveds, [FromHeader] string API_KEY)
         {
-            if (API_KEY =="123456")
-            {
-                var res = await _sender.Send(new InsertDeltaGeneraliApprovedUsersCommand(dGApproveds));
-                return Ok(res);
-            }
-            return Unauthorized();
-            
+            var res = await _sender.Send(new InsertDeltaGeneraliApprovedUsersCommand(dGApproveds));
+            return Ok(res);
+
         }
     }
 }

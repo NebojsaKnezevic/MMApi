@@ -1,7 +1,7 @@
 ﻿namespace MajaMayo.API.Middlewares
 {
    
-        public class CookieMiddleware
+        public class CookieMiddleware 
         {
             private readonly RequestDelegate _next;
 

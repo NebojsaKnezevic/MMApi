@@ -36,6 +36,21 @@ namespace MajaMayo.API.Repository
                 return "No users were inserted into the database. Please check the input data.";
             }
         }
+        //public Task<bool> HandleDGRequests(int healthExaminationId)
+        //{
+        //    //insert into db
+        //    //send to DG api
+        //    //update db with response msg
+        //    throw new NotImplementedException();
+        //}
+
+        //public Task<bool> HandleDGExaminationPDF(int healthExaminationId)
+        //{
+        //    //insert into db
+        //    //send to DG api
+        //    //update db with response msg
+        //    throw new NotImplementedException();
+        //}
 
     }
 }
