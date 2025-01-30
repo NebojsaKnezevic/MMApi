@@ -12,7 +12,7 @@ namespace MajaMayo.API.Middlewares
         public ApiKeyMiddleware(IConfiguration configuration)
         {
             _configuration = configuration;
-            ValidApiKey = Environment.GetEnvironmentVariable("DG_API-KEY") ?? _configuration.GetValue<string>("ApiKey"); 
+            ValidApiKey = Environment.GetEnvironmentVariable("DG_API_KEY") ?? _configuration.GetValue<string>("ApiKey"); 
 
         }
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
