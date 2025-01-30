@@ -11,27 +11,29 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
-
-
-
-var   builder = WebApplication.CreateBuilder(args);
-
 //var logger = new LoggerConfiguration()
 //    .WriteTo.Console()
-//    .WriteTo.MSSqlServer(
-//        connectionString: "YourDatabaseConnectionString",
-//        sinkOptions: new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
+//    .WriteTo.File("logs/dg_requests.log",
+//    rollingInterval: RollingInterval.Day,
+//    retainedFileCountLimit: null,
+//    restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
+//    .WriteTo.File("logs/dg_examinations.log",
+//    rollingInterval: RollingInterval.Day,
+//    retainedFileCountLimit: null,
+//    restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
 //    .CreateLogger();
+
+//Log.Logger = logger;
+var builder = WebApplication.CreateBuilder(args);
+
+
 
 builder.Services.AddLogging();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();
 builder.Services.AddTransient<ApiKeyMiddleware>();
 
-builder.Host.UseSerilog((context, services, configuration) => configuration
-    .ReadFrom.Configuration(context.Configuration)
-    .ReadFrom.Services(services)
-    .Enrich.FromLogContext());
+builder.Host.UseSerilog();
 
 
 builder.Services.AddControllers();
