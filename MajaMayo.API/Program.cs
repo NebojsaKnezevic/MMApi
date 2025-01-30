@@ -25,7 +25,8 @@ var   builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLogging();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-builder.Services.AddScoped<GlobalExceptionHandlerMiddleware>();
+builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();
+builder.Services.AddTransient<ApiKeyMiddleware>();
 
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
@@ -163,14 +164,15 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
-
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseMiddleware<CookieMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
 app.UseMiddleware<ApiResponseMiddleware>();
+app.UseMiddleware<ApiKeyMiddleware>();
 app.Run();
 
 

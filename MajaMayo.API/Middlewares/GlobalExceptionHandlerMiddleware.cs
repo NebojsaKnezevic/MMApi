@@ -58,6 +58,7 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
 
             if (exception.GetType() == typeof(UnauthorizedAccessException))
             {
+                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 await context.Response.WriteAsync("Unauthorized access");
                 await _commandRepository.LogError(new Models.LogEntry
                 {

@@ -53,7 +53,6 @@ namespace MajaMayo.API.Middlewares
 
                 if (contentType != null && contentType.Contains("application/json"))
                 {
-                    // Wrap JSON response into the ApiResponse object
                     var apiResponse = new ApiResponse
                     {
                         Data = responseObject,
@@ -66,7 +65,6 @@ namespace MajaMayo.API.Middlewares
                 }
                 else
                 {
-                    // For non-JSON responses, keep the original response body as is
                     var apiResponse = new ApiResponse
                     {
                         Data = responseBodyText,
