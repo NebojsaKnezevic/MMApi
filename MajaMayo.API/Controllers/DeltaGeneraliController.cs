@@ -20,7 +20,7 @@ namespace MajaMayo.API.Controllers
         }
 
         [HttpPost("RegisterDGUsers")]
-        public async Task<IActionResult> RegisterDGUsers([FromBody] List<DGApprovedUserResponse> dGApproveds, [FromHeader] string API_KEY)
+        public async Task<IActionResult> RegisterDGUsers([FromBody] List<DGApprovedUserResponse> dGApproveds, [FromHeader] string ApiKey)
         {
             var res = await _sender.Send(new InsertDeltaGeneraliApprovedUsersCommand(dGApproveds));
             return Ok(res);

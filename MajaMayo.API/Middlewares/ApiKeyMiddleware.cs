@@ -26,7 +26,7 @@ namespace MajaMayo.API.Middlewares
                 //    await context.Response.WriteAsync("API Key is missing.");
                 //    return;
                 //}
-                if (!context.Request.Headers.TryGetValue("API_KEY", out var extractedApiKey))
+                if (!context.Request.Headers.TryGetValue("ApiKey", out var extractedApiKey))
                 {
                     context.Response.StatusCode = StatusCodes.Status400BadRequest;
                     context.Response.ContentType = "text/plain";
