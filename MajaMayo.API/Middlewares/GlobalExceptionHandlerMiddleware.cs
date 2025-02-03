@@ -1,4 +1,6 @@
-﻿using MajaMayo.API.Repository;
+﻿using MajaMayo.API.Helpers;
+using MajaMayo.API.Models;
+using MajaMayo.API.Repository;
 using System.Net;
 using System.Text.Json;
 
@@ -54,13 +56,14 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
         {
             context.Response.ContentType = "application/json";
 
-        
+            var jwtToken = context.Request.Cookies[JWTHelper.SecretTokenName];
+            var userId = JWTHelper.DeconstructJWT(jwtToken)?.Id;
 
             if (exception.GetType() == typeof(UnauthorizedAccessException))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                await context.Response.WriteAsync("Unauthorized access");
-                await _commandRepository.LogError(new Models.LogEntry
+                //await context.Response.WriteAsync("Unauthorized access");
+                var response = new Models.LogEntry
                 {
                     LogLevel = "Error",
                     Message = "Unauthorized access attempt",
@@ -68,23 +71,41 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
                     EventId = null,
                     Source = "GlobalExceptionHandlerMiddleware",
                     RequestPath = context.Request.Path,
-                    UserId = context.User?.Identity?.Name
-                });
+                    UserId = userId
+                };
+
+                context.Response.ContentType = "application/json";
+                var jsonResponse =  JsonSerializer.Serialize(response);
+                if (!context.Response.HasStarted)
+                {
+                    await context.Response.WriteAsync(jsonResponse);
+                }
+
+                await _commandRepository.LogError(response);
             }
             else
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                await context.Response.WriteAsync("An error occured while processing request.");
-                await _commandRepository.LogError(new Models.LogEntry
+
+                var response = new Models.LogEntry
                 {
                     LogLevel = "Error",
-                    Message = "Unhandled exception",
+                    Message = "Unauthorized access attempt",
                     Exception = exception.ToString(),
                     EventId = null,
                     Source = "GlobalExceptionHandlerMiddleware",
                     RequestPath = context.Request.Path,
-                    UserId = context.User?.Identity?.Name
-                });
+                    UserId = userId
+                };
+
+                context.Response.ContentType = "application/json";
+                var jsonResponse = JsonSerializer.Serialize(response);
+                if (!context.Response.HasStarted)
+                {
+                    await context.Response.WriteAsync(jsonResponse);
+                }
+
+                await _commandRepository.LogError(response);
             }
         }
 

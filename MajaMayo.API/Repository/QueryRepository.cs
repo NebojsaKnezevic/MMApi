@@ -62,15 +62,15 @@ namespace MajaMayo.API.Repository
             return response.ToList();
         }
 
-        public async Task<FamilyHistoryModel> GetFamilyHistory(int id)
-        {
-            var pars = new DynamicParameters();
+        //public async Task<FamilyHistoryModel> GetFamilyHistory(int id)
+        //{
+        //    var pars = new DynamicParameters();
 
-            pars.Add("@Id",id, DbType.Int32);
+        //    pars.Add("@Id",id, DbType.Int32);
 
-            var response = await _context.QueryFirstAsync<FamilyHistoryModel>("spGetFamilyHistory", pars, commandType: CommandType.StoredProcedure);
-            return response;
-        }
+        //    var response = await _context.QueryFirstAsync<FamilyHistoryModel>("spGetFamilyHistory", pars, commandType: CommandType.StoredProcedure);
+        //    return response;
+        //}
 
         public async Task<ICollection<HealthExaminationResponse>> GetHealthExaminations()
         {

@@ -1,8 +1,7 @@
 ﻿using MajaMayo.API.Models;
-using MajaMayo.API.Models.DeltaGenerali.Command;
+using MajaMayo.API.Features.DeltaGenerali.Command;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace MajaMayo.API.Controllers
 {
@@ -20,11 +19,18 @@ namespace MajaMayo.API.Controllers
         }
 
         [HttpPost("RegisterDGUsers")]
-        public async Task<IActionResult> RegisterDGUsers([FromBody] List<DGApprovedUserResponse> dGApproveds, [FromHeader] string API_KEY)
+        public async Task<IActionResult> RegisterDGUsers([FromBody] List<DGApprovedUserResponse> dGApproveds, [FromHeader] string ApiKey)
         {
             var res = await _sender.Send(new InsertDeltaGeneraliApprovedUsersCommand(dGApproveds));
             return Ok(res);
 
+        }
+
+        [HttpPost("HandleDGRequests/{id:int}")]
+        public async Task<IActionResult> HandleDGRequests(int id)
+        {
+            var res = await _sender.Send(new HandleDGRequestsCommand(id));
+            return Ok(res);
         }
     }
 }

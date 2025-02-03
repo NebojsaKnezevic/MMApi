@@ -8,7 +8,7 @@ using MajaMayo.API.ConfigModel;
 using MajaMayo.API.DTOs;
 using MajaMayo.API.Helpers;
 using MajaMayo.API.Models;
-using MajaMayo.API.Models.Survey.Command.User;
+using MajaMayo.API.Features.Survey.Command.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -30,7 +30,7 @@ namespace MajaMayo.API.Repository
        
         private readonly IHttpContextAccessor _httpContext;
         //private readonly UserManager<UserResponse> _userManager;
-        private readonly string SecretTokenName = "ACTTokenAuth";
+        
         //private readonly UserManager<UserResponse> _userManager;
         private readonly SecuritySettings _securitySettings;
         private readonly EmailSettings _emailSettings;
@@ -124,17 +124,9 @@ namespace MajaMayo.API.Repository
 
                 if (!isVerified) throw new Exception("Incorrect password"); 
 
-                var tokenString = GenerateJWTToken(result);
+                var tokenString = JWTHelper.GenerateJWTToken(result);
 
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddHours(12)
-                };
-
-                _httpContext.HttpContext.Response.Cookies.Append(SecretTokenName, tokenString, cookieOptions);
+                _httpContext.HttpContext.Response.Cookies.Append(JWTHelper.SecretTokenName, tokenString, JWTHelper.CurrentOptions);
 
                 return result;
             }
@@ -179,17 +171,9 @@ namespace MajaMayo.API.Repository
 
                     result = await _connection.QueryFirstOrDefaultAsync<UserResponse>("spGoogleLoginUser", pars, commandType: CommandType.StoredProcedure);
 
-                    var tokenString = GenerateJWTToken(result);
+                    var tokenString = JWTHelper.GenerateJWTToken(result);
 
-                    var cookieOptions = new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.None,
-                        Expires = DateTime.UtcNow.AddHours(12)
-                    };
-
-                    _httpContext.HttpContext.Response.Cookies.Append(SecretTokenName, tokenString, cookieOptions);
+                    _httpContext.HttpContext.Response.Cookies.Append(JWTHelper.SecretTokenName, tokenString, JWTHelper.CurrentOptions);
                     var sql = "SELECT * FROM [MajaMayo].[dbo].[User] WHERE Email = @Email";
                     var product = await _connection.QuerySingleAsync<UserResponse>(sql, new { Email = payload.Email });
                     result = product;
@@ -208,36 +192,13 @@ namespace MajaMayo.API.Repository
             return result;
         }
 
-        private string GenerateJWTToken(UserResponse user)
-        {
-            var claims = new List<Claim> {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            //new Claim(ClaimTypes.Name, user.FirstName),
-            //new Claim(ClaimTypes.Surname, user.LastName),
-            new Claim(ClaimTypes.Email, user.Email),
-            //new Claim(ClaimTypes.Gender, user.Gender),
-            new Claim(ClaimTypes.GivenName, user.FirstName + user.LastName),
-            new Claim(ClaimTypes.Role, user.Role)
-            };
-
-            var jwtToken = new JwtSecurityToken(
-                claims: claims,
-                notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.AddHours(12),
-                signingCredentials: new SigningCredentials(
-                    new SymmetricSecurityKey(
-                       Encoding.UTF8.GetBytes(_securitySettings.SecurityKey)
-                        ),
-                    SecurityAlgorithms.HmacSha256Signature)
-                );
-            return new JwtSecurityTokenHandler().WriteToken(jwtToken);
-        }
+      
 
       
 
         public async Task<UserResponse> CookieLoginUser()
         {
-            var jwtToken = _httpContext.HttpContext.Request.Cookies[SecretTokenName];
+            var jwtToken = _httpContext.HttpContext.Request.Cookies[JWTHelper.SecretTokenName];
             UserResponse userDataFromCookie;
 
             if (string.IsNullOrEmpty(jwtToken))
@@ -249,34 +210,9 @@ namespace MajaMayo.API.Repository
 
             try
             {
-                var handler = new JwtSecurityTokenHandler();
-                var jwtSecurityToken = handler.ReadJwtToken(jwtToken);
-
-                //var expTime = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Expiration)?.Value;
-                var id = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-                //var firstName = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value;
-                //var lastName = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Surname)?.Value;
-                var email = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
-                //var gender = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Gender)?.Value;
-                var givenName = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.GivenName)?.Value;
-
-                if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(email))
-                {
-                    throw new UnauthorizedAccessException("Invalid JWT token.");
-                }
-                userDataFromCookie = new UserResponse
-                {
-                    Id = int.Parse(id),
-                    //FirstName = firstName,
-                    //LastName = lastName,
-                    Email = email,
-                    //Gender = gender
-                };
-                pars.Add("@Id", id, DbType.Int32, ParameterDirection.Input);
-                //pars.Add("@FirstName", firstName, DbType.String, ParameterDirection.Input);
-                //pars.Add("@LastName", lastName, DbType.String, ParameterDirection.Input);
-                pars.Add("@Email", email, DbType.String, ParameterDirection.Input);
-                //pars.Add("@Gender", gender, DbType.String, ParameterDirection.Input);
+                userDataFromCookie = JWTHelper.DeconstructJWT(jwtToken);
+                pars.Add("@Id", userDataFromCookie.Id, DbType.Int32, ParameterDirection.Input);
+                pars.Add("@Email", userDataFromCookie.Email, DbType.String, ParameterDirection.Input);
 
             }
             catch (Exception ex)
@@ -335,15 +271,7 @@ namespace MajaMayo.API.Repository
 
         public Task<bool> LogoutUser()
         {
-            var cookieOptions = new CookieOptions() 
-            { 
-                Expires = DateTime.UtcNow.AddDays(-1)
-                ,HttpOnly = true
-                ,Secure = true
-                ,SameSite = SameSiteMode.None
-            };
-
-            _httpContext.HttpContext.Response.Cookies.Append(SecretTokenName, "", cookieOptions);
+            _httpContext.HttpContext.Response.Cookies.Append(JWTHelper.SecretTokenName, "", JWTHelper.LogoutOptions);
             return Task.FromResult(true);
         }
 

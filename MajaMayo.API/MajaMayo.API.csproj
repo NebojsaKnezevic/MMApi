@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\DeltaGenerali\Query\" />
-    <Folder Include="Models\Survey\Query\User\" />
+    <Folder Include="Features\DeltaGenerali\Query\" />
+    <Folder Include="Features\Survey\Query\User\" />
   </ItemGroup>
 
 </Project>
