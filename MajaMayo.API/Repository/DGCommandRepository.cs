@@ -52,5 +52,42 @@ namespace MajaMayo.API.Repository
         //    throw new NotImplementedException();
         //}
 
+        public async Task<bool> HandleDGRequests(int healthAssessmentId)
+        {
+            //insert into db
+            var pars = new DynamicParameters();
+            pars.Add("@HealthAssessmentId", healthAssessmentId);
+            var result = await _connection.ExecuteScalarAsync<int>("dbo.spInsertDGRequest", pars, commandType: CommandType.StoredProcedure);
+
+            if (result != -1)
+            {
+                //send to dg 
+                var statusCode = 200;
+                var responseMsg = "To be implemented after we receive API from DG.";
+
+                //update db with response
+                var pars2 = new DynamicParameters();
+                pars2.Add("@RequestId", result, DbType.Int32);
+                pars2.Add("@StatusCode", statusCode);
+                pars2.Add("@ResponseMessage", responseMsg);
+
+                var result2 = await _connection.ExecuteScalarAsync<int>("dbo.spUpdateDGRequest", pars2, commandType: CommandType.StoredProcedure);
+                if (result2 > 1)
+                {
+                    throw new Exception("Error, affected more than 1 row in DG_request table, this should not happen!");
+                }
+            }
+            else 
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public Task<bool> HandleHealthExaminationPDF(int healthAssessmentId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

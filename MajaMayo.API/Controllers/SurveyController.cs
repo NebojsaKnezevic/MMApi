@@ -1,37 +1,19 @@
 ﻿
-using MajaMayo.API.Models.Survey.Query.GetQuestions;
-using MajaMayo.API.Repository;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MajaMayo.API.Models.Survey.Query.GetAnswers;
-using MajaMayo.API.Models.Survey.Query.GetQuestionGroups;
-using System.ComponentModel.DataAnnotations;
-using MajaMayo.API.Models.Survey.Command.User;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using MajaMayo.API.Mapper;
-using MajaMayo.API.DTOs;
-using MajaMayo.API.Models.Survey.Command.HealthAssesment;
-using MajaMayo.API.Models.Survey.Command.Answer;
-using MajaMayo.API.Models.Survey.Query.HealthAssesment;
-using Microsoft.AspNetCore.Identity;
-using MajaMayo.API.Models.Survey.Command.Email;
-using Microsoft.VisualBasic;
-using ACT.Security.Service;
+using MajaMayo.API.Features.Survey.Command.HealthAssesment;
+using MajaMayo.API.Features.Survey.Query.HealthAssesment;
 using MajaMayo.API.Models;
-using MajaMayo.API.Models.Survey.Command.FamilyHistory;
-//using System.Web.Http;
-using MajaMayo.API.Models.Survey.Query.FamilyHistory;
-using Microsoft.Extensions.Options;
-using MajaMayo.API.ConfigModel;
-using System.Net.WebSockets;
-using MajaMayo.API.Models.Survey.Query.HealthExaminations;
-using MajaMayo.API.Models.Survey.Query.HealthAssessmentScore;
+using MajaMayo.API.Features.Survey.Query.HealthExaminations;
+using MajaMayo.API.Features.Survey.Query.HealthAssessmentScore;
+using MajaMayo.API.Features.Survey.Command.Answer;
+using MajaMayo.API.Features.Survey.Command.Email;
+using MajaMayo.API.Features.Survey.Command.User;
+using MajaMayo.API.Features.Survey.Query.Answer;
+using MajaMayo.API.Features.Survey.Query.Question;
+using MajaMayo.API.Features.Survey.Query.QuestionGroup;
+using MajaMayo.API.Features.DeltaGenerali.Command;
 
 namespace MajaMayo.API.Controllers
 {
@@ -187,6 +169,12 @@ namespace MajaMayo.API.Controllers
         public async Task<IActionResult> CompleteSurvey(int id) 
         {
             var result = await _sender.Send(new CompleteSurveyCommand() { haid = id });
+            if (result == true)
+            {
+                // Redirect to a different controller action
+                var dgResult = await _sender.Send(new HandleDGRequestsCommand(id));
+                return Ok(dgResult);
+            }
             return Ok(result);
         }
         [HttpGet("Query/GetHealthExaminations")]

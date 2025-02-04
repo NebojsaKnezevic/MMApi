@@ -15,6 +15,7 @@ namespace MajaMayo.API.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
+           
             var originalBodyStream = context.Response.Body;
 
             using (var responseBody = new MemoryStream())
@@ -25,7 +26,6 @@ namespace MajaMayo.API.Middlewares
 
                 var contentType = context.Response.ContentType;
 
-                // Read the response body
                 var responseBodyText = await new StreamReader(responseBody).ReadToEndAsync();
 
                 object responseObject = null;
@@ -36,12 +36,10 @@ namespace MajaMayo.API.Middlewares
                 {
                     using (var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(responseBodyText)))
                     {
-                        // Attempt to deserialize JSON content
                         responseObject = await JsonSerializer.DeserializeAsync<object>(jsonStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     }
                 }
 
-                // Check for an HTTP client response to determine the message
                 if (context.Items.ContainsKey("HttpClientResponse"))
                 {
                     var httpClientResponse = context.Items["HttpClientResponse"] as HttpResponseMessage;
@@ -76,17 +74,15 @@ namespace MajaMayo.API.Middlewares
                     //jsonResponse = responseBodyText;
                 }
 
-                // Write the modified response back to the original stream
                 context.Response.Body = originalBodyStream;
 
-                // Set the appropriate content type
                 if (jsonResponse == responseBodyText)
                 {
-                    context.Response.ContentType = contentType; // Keep the original content type
+                    context.Response.ContentType = contentType; 
                 }
                 else
                 {
-                    context.Response.ContentType = "application/json"; // Set content type to JSON
+                    context.Response.ContentType = "application/json"; 
                 }
 
                 await context.Response.WriteAsync(jsonResponse);

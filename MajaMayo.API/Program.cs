@@ -1,7 +1,7 @@
 using MajaMayo.API.ConfigModel;
+using MajaMayo.API.Helpers;
 using MajaMayo.API.Middlewares;
 using MajaMayo.API.Repository;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
@@ -10,6 +10,8 @@ using Serilog;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+
+var   builder = WebApplication.CreateBuilder(args);
 
 //var logger = new LoggerConfiguration()
 //    .WriteTo.Console()
@@ -24,7 +26,6 @@ using System.Text;
 //    .CreateLogger();
 
 //Log.Logger = logger;
-var builder = WebApplication.CreateBuilder(args);
 
 
 
@@ -98,7 +99,8 @@ builder.Services.AddCors(options =>
         });
 });
 
-var securityKey = Environment.GetEnvironmentVariable("SECURITY_KEY") ?? builder.Configuration.GetSection(SecuritySettings.Name + ":SecurityKey").Value!;
+//var securityKey = Environment.GetEnvironmentVariable("SECURITY_KEY") ?? builder.Configuration.GetSection(SecuritySettings.Name + ":SecurityKey").Value!;
+var securityKey = JWTHelper.securityKey;
 
 var key = Encoding.ASCII.GetBytes(securityKey);
 builder.Services.AddAuthentication(options =>
@@ -132,20 +134,7 @@ builder.Services.AddAuthentication(options =>
 
 
 var app = builder.Build(); 
-  
 
-//dsadasdasasdas
-//app.Use(async (context, next) =>
-//{
-//    context.Response.Headers["Cross-Origin-Opener-Policy"] = "unsafe-none";
-//    //context.Response.Headers.Remove("Cross-Origin-Opener-Policy");
-
-//    context.Response.Headers["Cross-Origin-Embedder-Policy"] = "unsafe-none";
-//    await next();
-
-//});
-
-app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseSerilogRequestLogging(options =>
 {
@@ -165,6 +154,8 @@ app.UseSerilogRequestLogging(options =>
 app.UseSwagger();
 app.UseSwaggerUI();
 //}
+app.UseMiddleware<ApiResponseMiddleware>();
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
@@ -173,7 +164,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.UseMiddleware<ApiResponseMiddleware>();
 app.UseMiddleware<ApiKeyMiddleware>();
 app.Run();
 
