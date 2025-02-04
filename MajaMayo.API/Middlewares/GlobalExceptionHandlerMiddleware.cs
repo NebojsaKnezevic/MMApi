@@ -57,7 +57,12 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
             context.Response.ContentType = "application/json";
 
             var jwtToken = context.Request.Cookies[JWTHelper.SecretTokenName];
-            var userId = JWTHelper.DeconstructJWT(jwtToken)?.Id;
+            //var userId = JWTHelper.DeconstructJWT(jwtToken)?.Id;
+            int? userId = 0;
+            if (context.Request.Path.HasValue && context.Request.Path.Value.Contains("DeltaGenerali/RegisterDGUsers"))
+            {
+                userId = JWTHelper.DeconstructJWT(jwtToken)?.Id;
+            }
 
             if (exception.GetType() == typeof(UnauthorizedAccessException))
             {
