@@ -26,7 +26,6 @@ var   builder = WebApplication.CreateBuilder(args);
 //    .CreateLogger();
 
 //Log.Logger = logger;
-var builder = WebApplication.CreateBuilder(args);
 
 
 
