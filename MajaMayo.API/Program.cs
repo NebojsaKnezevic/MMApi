@@ -132,8 +132,8 @@ builder.Services.AddAuthentication(options =>
 
 
 
-var app = builder.Build(); 
-app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+var app = builder.Build();
+
 
 app.UseSerilogRequestLogging(options =>
 {
@@ -153,9 +153,8 @@ app.UseSerilogRequestLogging(options =>
 app.UseSwagger();
 app.UseSwaggerUI();
 //}
-
-
-
+app.UseMiddleware<ApiResponseMiddleware>();
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
@@ -164,7 +163,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.UseMiddleware<ApiResponseMiddleware>();
 app.UseMiddleware<ApiKeyMiddleware>();
 app.Run();
 
