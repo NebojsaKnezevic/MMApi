@@ -155,7 +155,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 app.UseMiddleware<ApiResponseMiddleware>();
-app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+//app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
