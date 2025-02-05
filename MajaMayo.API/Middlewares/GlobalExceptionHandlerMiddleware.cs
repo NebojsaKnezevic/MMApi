@@ -15,7 +15,7 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
     };
 
     private readonly ILogger<GlobalExceptionHandlerMiddleware> _logger;
-    //private readonly ICommandRepository _commandRepository;
+    private readonly ICommandRepository _commandRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GlobalExceptionHandlerMiddleware"/> class.
@@ -24,7 +24,7 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
     public GlobalExceptionHandlerMiddleware(ILogger<GlobalExceptionHandlerMiddleware> logger, ICommandRepository commandRepository)
     {
         _logger = logger;
-        //_commandRepository = commandRepository;
+        _commandRepository = commandRepository;
     }
 
     /// <inheritdoc />
@@ -38,7 +38,7 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
         {
             _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
 
-            //await HandleExceptionAsync(context, ex);
+            await HandleExceptionAsync(context, ex);
         }
     }
 
@@ -86,7 +86,7 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
                     await context.Response.WriteAsync(jsonResponse);
                 }
 
-                //await _commandRepository.LogError(response);
+                await _commandRepository.LogError(response);
             }
             else
             {
@@ -110,7 +110,7 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
                     await context.Response.WriteAsync(jsonResponse);
                 }
 
-                //await _commandRepository.LogError(response);
+                await _commandRepository.LogError(response);
             }
         }
 
