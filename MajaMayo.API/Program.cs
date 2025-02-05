@@ -156,6 +156,7 @@ app.UseSwaggerUI();
 //}
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+app.UseMiddleware<ApiResponseMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
@@ -164,7 +165,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.UseMiddleware<ApiResponseMiddleware>();
+
 app.UseMiddleware<ApiKeyMiddleware>();
 app.Run();
 
