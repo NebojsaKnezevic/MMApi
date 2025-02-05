@@ -36,7 +36,6 @@ builder.Services.AddTransient<ApiKeyMiddleware>();
 
 builder.Host.UseSerilog();
 
-
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

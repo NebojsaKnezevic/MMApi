@@ -8,7 +8,8 @@ namespace MajaMayo.API.Repository
         Task<string> InsertDeltaGeneraliApprovedUsers(ICollection<DGApprovedUserResponse> dGApproveds);
 
         Task<bool> HandleDGRequests(int healthAssessmentId);
-        Task<bool> HandleHealthExaminationPDF(int healthAssessmentId);
+        Task<byte[]> HandleSurveyPDF(byte[] html, int healthAssessmentId);
+
 
     }
 }

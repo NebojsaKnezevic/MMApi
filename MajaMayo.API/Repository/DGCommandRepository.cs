@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MajaMayo.API.DTOs;
+using MajaMayo.API.Helpers;
 using MajaMayo.API.Mapper;
 using MajaMayo.API.Models;
 using System.Data;
@@ -85,9 +86,14 @@ namespace MajaMayo.API.Repository
             return true;
         }
 
-        public Task<bool> HandleHealthExaminationPDF(int healthAssessmentId)
+        public Task<byte[]> HandleSurveyPDF(byte[] html, int healthAssessmentId)
         {
-            throw new NotImplementedException();
+            //Generisati PDF od HTML-a
+            byte[] resultPDF = PDFHelper.GeneratePdfFromHtml(html);
+            //Pozvati DG API ovde
+            //Zabeleziti u bazi sta smo poslali i response od DG API
+
+            return Task.FromResult(resultPDF);
         }
     }
 }
