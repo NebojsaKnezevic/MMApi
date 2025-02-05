@@ -49,16 +49,7 @@ jobs:
          echo "TIMESTAMP=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
          echo "BACKUP_DIR=/var/www/api/backup/html_$TIMESTAMP" >> $GITHUB_ENV
     
-    - name: Create backup and copy existing files
-      env:
-         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-         SSH_HOST: ${{ secrets.SSH_HOST }}
-         SSH_USER: ${{ secrets.SSH_USER }}
-         BACKUP_DIR: ${{ env.BACKUP_DIR }}
-      run: |
-        # Ensure correct permissions on the target directory
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S mkdir -p $BACKUP_DIR && echo $SSH_PASSWORD | sudo -S chown -R $SSH_USER:$SSH_USER $BACKUP_DIR | sudo -S cp -r /var/www/api/html/* $BACKUP_DIR"   
-
+    
     - name: Set environment variables on remote server
       env:
         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
