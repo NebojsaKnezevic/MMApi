@@ -154,8 +154,8 @@ app.UseSerilogRequestLogging(options =>
 app.UseSwagger();
 app.UseSwaggerUI();
 //}
-app.UseMiddleware<ApiResponseMiddleware>();
-//app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+//app.UseMiddleware<ApiResponseMiddleware>();
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
