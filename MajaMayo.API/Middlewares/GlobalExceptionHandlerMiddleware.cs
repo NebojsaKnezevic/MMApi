@@ -59,7 +59,7 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
             var jwtToken = context.Request.Cookies[JWTHelper.SecretTokenName];
             //var userId = JWTHelper.DeconstructJWT(jwtToken)?.Id;
             int? userId = 0;
-            if (context.Request.Path.HasValue && context.Request.Path.Value.Contains("DeltaGenerali/RegisterDGUsers"))
+            if (context.Request.Path.HasValue && context.Request.Path.Value.Contains("Survey"))
             {
                 userId = JWTHelper.DeconstructJWT(jwtToken)?.Id;
             }
