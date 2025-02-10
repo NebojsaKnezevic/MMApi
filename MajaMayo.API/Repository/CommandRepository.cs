@@ -21,6 +21,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.ComponentModel;
+using MajaMayo.API.Constants;
+using MajaMayo.API.Errors;
+using System.Data.Common;
 
 namespace MajaMayo.API.Repository
 {
@@ -50,13 +54,15 @@ namespace MajaMayo.API.Repository
         }
         public async Task<bool> RegisterUser(string Email, string Pwd)
         {
+
+            await IsAllowed(Email);
             //Pwd = Security.Encrypt(_securitySettings.SecurityKey, Pwd);
             byte[] passwordHash;
             byte[] passwordSalt;
             PasswordHash.CreatePasswordHash(Pwd, out passwordHash, out passwordSalt);
             var pars = new { Email = Email, PwdHash = passwordHash, PwdSalt = passwordSalt };
             var result = await _connection.ExecuteScalarAsync<bool>("spRegisterUser", pars, commandType: CommandType.StoredProcedure);
-            if (!result) throw new Exception("Email already exists!");
+            if (!result) throw new Exception("Email is already in use!");
 
             // Encrypt Email
             var emailVerification = Security.Encrypt(_securitySettings.SecurityKey, Email);
@@ -92,6 +98,18 @@ namespace MajaMayo.API.Repository
             return result;
         }
 
+        private async Task IsAllowed(string email)
+        {
+            var parsdg = new DynamicParameters();
+            parsdg.Add("@Email", email);
+            var dgApprovedUser = await _connection.QueryAsync<DGApprovedUserResponse>("spGetDGApprovedUserByEmail", parsdg, commandType: CommandType.StoredProcedure);
+            if (dgApprovedUser.Count() == 0)
+            {
+                throw new UnauthorizedAccessException("The email provided is not on the Delta Generali approved user list. Please contact them for further assistance.");
+            }
+
+        }
+
         public void SendEmail(EmailDTO email)
         {
             var mail = new MimeMessage();
@@ -113,40 +131,23 @@ namespace MajaMayo.API.Repository
 
         public async Task<UserResponse> LoginUser(string Email, string Pwd)
         {
-            try
-            {
-                //Pwd = Security.Encrypt(_securitySettings.SecurityKey, Pwd);
- 
-                var pars = new { Email = Email };
-                var result = await _connection.QuerySingleAsync<UserResponse>("spLoginUser", pars, commandType: CommandType.StoredProcedure);
+            //await IsAllowed(Email);
+            var pars = new { Email = Email };
 
-                var isVerified = PasswordHash.VerifyPasswordHash(Pwd, result.PasswordHash, result.PasswordSalt);
+            var result = await _connection.QuerySingleAsync<UserResponse>("spLoginUser", pars, commandType: CommandType.StoredProcedure);
+            //store procedure spLoginUser handles the error if email is registered.
 
-                if (!isVerified) throw new Exception("Incorrect password"); 
+            var pwdCorrect = PasswordHash.VerifyPasswordHash(Pwd, result.PasswordHash, result.PasswordSalt);
+            if (!pwdCorrect) throw new UnauthorizedAccessException("The provided password is incorrect.");
 
-                var tokenString = JWTHelper.GenerateJWTToken(result);
+            var tokenString = JWTHelper.GenerateJWTToken(result);
 
-                _httpContext.HttpContext.Response.Cookies.Append(JWTHelper.SecretTokenName, tokenString, JWTHelper.CurrentOptions);
+            _httpContext.HttpContext.Response.Cookies.Append(JWTHelper.SecretTokenName, tokenString, JWTHelper.CurrentOptions);
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("Email not found"))
-                {
-                    throw new Exception("The provided email address is not registered.");
-                }
-                else if (ex.Message.Contains("Incorrect password"))
-                {
-                    throw new Exception("The provided password is incorrect.");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            
+            return result;
         }
+            
+        
 
         public async Task<UserResponse> GoogleLogin(GoogleLoginResponse googleResponse)
         {

@@ -1,6 +1,8 @@
-﻿using MajaMayo.API.Helpers;
+﻿using MajaMayo.API.Constants;
+using MajaMayo.API.Helpers;
 using MajaMayo.API.Models;
 using MajaMayo.API.Repository;
+using System.Data.SqlClient;
 using System.Net;
 using System.Text.Json;
 
@@ -59,62 +61,70 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
             var jwtToken = context.Request.Cookies[JWTHelper.SecretTokenName];
             //var userId = JWTHelper.DeconstructJWT(jwtToken)?.Id;
             int? userId = 0;
-            if (context.Request.Path.HasValue && context.Request.Path.Value.Contains("Survey"))
+            if (context.Request.Path.HasValue && context.Request.Path.Value.Contains("Survey") && jwtToken is not null)
             {
                 userId = JWTHelper.DeconstructJWT(jwtToken)?.Id;
             }
 
-            if (exception.GetType() == typeof(UnauthorizedAccessException))
+            context.Response.StatusCode = HandleStatusCode(exception);
+            //await context.Response.WriteAsync("Unauthorized access");
+            var response = new Models.LogEntry
             {
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                //await context.Response.WriteAsync("Unauthorized access");
-                var response = new Models.LogEntry
-                {
-                    LogLevel = "Error",
-                    Message = "Unauthorized access attempt",
-                    Exception = exception.ToString(),
-                    EventId = null,
-                    Source = "GlobalExceptionHandlerMiddleware",
-                    RequestPath = context.Request.Path,
-                    UserId = userId
-                };
+                LogLevel = "Error",
+                Message = exception.Message,
+                Exception = exception.ToString(),
+                EventId = null,
+                Source = "GlobalExceptionHandlerMiddleware",
+                RequestPath = context.Request.Path,
+                UserId = userId
+            };
 
-                context.Response.ContentType = "application/json";
-                var jsonResponse =  JsonSerializer.Serialize(response);
-                if (!context.Response.HasStarted)
-                {
-                    await context.Response.WriteAsync(jsonResponse);
-                }
-
-                await _commandRepository.LogError(response);
-            }
-            else
+            context.Response.ContentType = "application/json";
+            var jsonResponse = JsonSerializer.Serialize(response);
+            if (!context.Response.HasStarted)
             {
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-                var response = new Models.LogEntry
-                {
-                    LogLevel = "Error",
-                    Message = "Unauthorized access attempt",
-                    Exception = exception.ToString(),
-                    EventId = null,
-                    Source = "GlobalExceptionHandlerMiddleware",
-                    RequestPath = context.Request.Path,
-                    UserId = userId
-                };
-
-                context.Response.ContentType = "application/json";
-                var jsonResponse = JsonSerializer.Serialize(response);
-                if (!context.Response.HasStarted)
-                {
-                    await context.Response.WriteAsync(jsonResponse);
-                }
-
-                await _commandRepository.LogError(response);
+                await context.Response.WriteAsync(jsonResponse);
             }
+
+            await _commandRepository.LogError(response);
+
         }
 
     }
+
+    private int HandleStatusCode(Exception exception)
+    {   
+        switch (exception)
+        {
+            case UnauthorizedAccessException _:
+                return (int)HttpStatusCode.Unauthorized;
+
+            //case ForbiddenAccessException _:
+            //    return (int)HttpStatusCode.Forbidden;
+
+            case ArgumentException _:
+                return (int)HttpStatusCode.BadRequest;
+
+            case KeyNotFoundException _:
+                return (int)HttpStatusCode.NotFound;
+
+            case InvalidOperationException _:
+                return (int)HttpStatusCode.BadRequest;
+
+            case SqlException _:
+                return (int)HttpStatusCode.InternalServerError;
+
+            case TimeoutException _:
+                return (int)HttpStatusCode.RequestTimeout;
+
+            case Exception _:
+                return (int)HttpStatusCode.InternalServerError;
+
+            default:
+                return (int)HttpStatusCode.InternalServerError;
+        }
+    }
+
 
 
 }

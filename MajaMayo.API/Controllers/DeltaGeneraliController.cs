@@ -2,6 +2,8 @@
 using MajaMayo.API.Features.DeltaGenerali.Command;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Configuration;
 
 namespace MajaMayo.API.Controllers
 {
@@ -11,16 +13,19 @@ namespace MajaMayo.API.Controllers
     {
         private readonly ISender _sender;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IConfiguration _configuration;
 
-        public DeltaGeneraliController(ISender sender, IHttpContextAccessor httpContextAccessor) : base(sender)
+        public DeltaGeneraliController(ISender sender, IHttpContextAccessor httpContextAccessor, IConfiguration configuration) : base(sender)
         {
             _sender = sender;
             _httpContextAccessor = httpContextAccessor;
+            _configuration = configuration;
         }
 
         [HttpPost("RegisterDGUsers")]
-        public async Task<IActionResult> RegisterDGUsers([FromBody] List<DGApprovedUserResponse> dGApproveds, [FromHeader] string ApiKey)
+        public async Task<IActionResult> RegisterDGUsers([FromBody] List<DGApprovedUserResponse> dGApproveds, [FromHeader]string ApiKey)
         {
+
             var res = await _sender.Send(new InsertDeltaGeneraliApprovedUsersCommand(dGApproveds));
             return Ok(res);
 
