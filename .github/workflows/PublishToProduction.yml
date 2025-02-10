@@ -84,6 +84,8 @@ jobs:
         # Deploy the application
         sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./publish/MajaMayo.API/ $SSH_USER@$SSH_HOST:/var/www/api/html        
 
+        # Use appsettings from server
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S cp /var/www/api/appsettings.json /var/www/api/html/"
         # Clear Nginx cache
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo $SSH_PASSWORD | sudo -S rm -rf /var/cache/nginx/*"
         
