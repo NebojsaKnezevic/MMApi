@@ -48,8 +48,6 @@ namespace MajaMayo.API.Controllers
         [HttpGet("Query/GetQiestionGroups")]
         public async Task<IActionResult> GetQuestionGroups() 
         {
-           
-
             var result = await _sender.Send(new GetQuestionGroupsQuery());
             return Ok(result);
         }

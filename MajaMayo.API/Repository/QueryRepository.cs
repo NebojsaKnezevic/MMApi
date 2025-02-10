@@ -48,7 +48,7 @@ namespace MajaMayo.API.Repository
             pars.Add("@UserId", userId, DbType.Int32);
             pars.Add("@HealthAssessmentId", healthAssesmentId, DbType.Int32);
             var response = await _context.QueryAsync<AnswerResponse>("dbo.spGetAnswers", pars, commandType: CommandType.StoredProcedure);
-            var x = response.Where(x => x.Id == 615 || x.Id == 611).ToList();
+            //var x = response.Where(x => x.Id == 615 || x.Id == 611).ToList();
             return response.ToList();
         }
 
