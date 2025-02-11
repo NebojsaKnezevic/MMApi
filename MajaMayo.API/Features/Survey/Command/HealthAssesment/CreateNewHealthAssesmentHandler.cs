@@ -14,6 +14,10 @@ namespace MajaMayo.API.Features.Survey.Command.HealthAssesment
         public async Task<HealthAssesmentResponse> Handle(CreateNewHealthAssesmentCommand request, CancellationToken cancellationToken)
         {
             var result = await _repository.CreateNewHealthAssesment(request.UserId);
+            if (result is null)
+            {
+                throw new InvalidOperationException("Failed to create new health assessment due to internal server error.");
+            }
             return result;
         }
     }

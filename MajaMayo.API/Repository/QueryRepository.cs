@@ -17,10 +17,10 @@ namespace MajaMayo.API.Repository
         private readonly IDbConnection _context;
         private readonly IHttpContextAccessor _httpContext;
 
-        private List<CommonResponseObject> _response;
-        private IEnumerable<QuestionGroupResponse> _questionGroups;
-        private IEnumerable<QuestionResponse> _questions;
-        private IEnumerable<AnswerResponse> _answers;
+        //private List<CommonResponseObject> _response;
+        //private IEnumerable<QuestionGroupResponse> _questionGroups;
+        //private IEnumerable<QuestionResponse> _questions;
+        //private IEnumerable<AnswerResponse> _answers;
 
         public QueryRepository(IDbConnection context, IHttpContextAccessor httpContext)
         {

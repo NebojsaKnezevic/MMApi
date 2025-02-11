@@ -25,6 +25,7 @@ using System.ComponentModel;
 using MajaMayo.API.Constants;
 using MajaMayo.API.Errors;
 using System.Data.Common;
+using static Google.Apis.Auth.GoogleJsonWebSignature;
 
 namespace MajaMayo.API.Repository
 {
@@ -54,59 +55,22 @@ namespace MajaMayo.API.Repository
         }
         public async Task<bool> RegisterUser(string Email, string Pwd)
         {
-
-            await IsAllowed(Email);
-            //Pwd = Security.Encrypt(_securitySettings.SecurityKey, Pwd);
             byte[] passwordHash;
             byte[] passwordSalt;
             PasswordHash.CreatePasswordHash(Pwd, out passwordHash, out passwordSalt);
             var pars = new { Email = Email, PwdHash = passwordHash, PwdSalt = passwordSalt };
             var result = await _connection.ExecuteScalarAsync<bool>("spRegisterUser", pars, commandType: CommandType.StoredProcedure);
-            if (!result) throw new Exception("Email is already in use!");
-
-            // Encrypt Email
-            var emailVerification = Security.Encrypt(_securitySettings.SecurityKey, Email);
-
-            // URL Encode the encrypted email
-            //var encodedEmail = System.Net.WebUtility.UrlEncode(emailVerification);
-
-            // Create verification link
-            string verificationLink = $"http://localhost:5141/Survey/Command/VerifyEmail?data={emailVerification}";
-
-           
-
-            // Create HTML body
-            string emailBody = $@"
-            <html>
-            <body>
-                <h2>Email Verification</h2>
-                <p>Thank you for registering with us. Please click the link below to verify your email address:</p>
-                <p><a href='{verificationLink}'>Verify Email</a></p>
-                <p>If you did not register, please ignore this email.</p>
-            </body>
-            </html>";
-
-            // Send the email
-            SendEmail(new EmailDTO
-            {
-                To = Email,
-                Subject = "Email Verification",
-                Body = emailBody
-            });
-
 
             return result;
         }
 
-        private async Task IsAllowed(string email)
+        public async Task<bool> IsAllowed(string email)
         {
             var parsdg = new DynamicParameters();
             parsdg.Add("@Email", email);
             var dgApprovedUser = await _connection.QueryAsync<DGApprovedUserResponse>("spGetDGApprovedUserByEmail", parsdg, commandType: CommandType.StoredProcedure);
-            if (dgApprovedUser.Count() == 0)
-            {
-                throw new UnauthorizedAccessException("The email provided is not on the Delta Generali approved user list. Please contact them for further assistance.");
-            }
+      
+            return dgApprovedUser.Count() == 0;
 
         }
 
@@ -131,64 +95,23 @@ namespace MajaMayo.API.Repository
 
         public async Task<UserResponse> LoginUser(string Email, string Pwd)
         {
-            //await IsAllowed(Email);
             var pars = new { Email = Email };
-
             var result = await _connection.QuerySingleAsync<UserResponse>("spLoginUser", pars, commandType: CommandType.StoredProcedure);
-            //store procedure spLoginUser handles the error if email is registered.
-
-            var pwdCorrect = PasswordHash.VerifyPasswordHash(Pwd, result.PasswordHash, result.PasswordSalt);
-            if (!pwdCorrect) throw new UnauthorizedAccessException("The provided password is incorrect.");
-
-            var tokenString = JWTHelper.GenerateJWTToken(result);
-
-            _httpContext.HttpContext.Response.Cookies.Append(JWTHelper.SecretTokenName, tokenString, JWTHelper.CurrentOptions);
 
             return result;
         }
             
         
 
-        public async Task<UserResponse> GoogleLogin(GoogleLoginResponse googleResponse)
+        public async Task<UserResponse> GoogleLogin(Payload payload)
         {
-            UserResponse? result = null;
+            DynamicParameters pars = new DynamicParameters();
+            pars.Add("@Email", payload.Email, DbType.String);
+            pars.Add("@FirstName", payload.GivenName, DbType.String);
+            pars.Add("@LastName", payload.FamilyName, DbType.String);
+            pars.Add("@VerifiedEmail", payload.EmailVerified, DbType.Boolean);
 
-            //Potvrdi google token
-            try
-            {
-                var payload = await GoogleJsonWebSignature.ValidateAsync(googleResponse.Credential);
-
-
-               
-                //izvuci potrebne informacije credentials
-
-                if (payload is not null) 
-                {
-                    DynamicParameters pars = new DynamicParameters();
-                    pars.Add("@Email", payload.Email, DbType.String);
-                    pars.Add("@FirstName", payload.GivenName, DbType.String);
-                    pars.Add("@LastName", payload.FamilyName, DbType.String);
-                    pars.Add("@VerifiedEmail", payload.EmailVerified, DbType.Boolean);
-
-                    result = await _connection.QueryFirstOrDefaultAsync<UserResponse>("spGoogleLoginUser", pars, commandType: CommandType.StoredProcedure);
-
-                    var tokenString = JWTHelper.GenerateJWTToken(result);
-
-                    _httpContext.HttpContext.Response.Cookies.Append(JWTHelper.SecretTokenName, tokenString, JWTHelper.CurrentOptions);
-                    var sql = "SELECT * FROM [MajaMayo].[dbo].[User] WHERE Email = @Email";
-                    var product = await _connection.QuerySingleAsync<UserResponse>(sql, new { Email = payload.Email });
-                    result = product;
-                }
-
-                //ako user nije u bazi, zavedi ga u suportnom povuci njegove podatke iz baze.
-            }
-            catch (Exception)
-            {
-                throw new Exception("Unauthorized try to log in");
-            }
-            
-
-            
+            var result = await _connection.QueryFirstOrDefaultAsync<UserResponse>("spGoogleLoginUser", pars, commandType: CommandType.StoredProcedure);
 
             return result;
         }
@@ -197,45 +120,14 @@ namespace MajaMayo.API.Repository
 
       
 
-        public async Task<UserResponse> CookieLoginUser()
+        public async Task<UserResponse> CookieLoginUser(int id, string email)
         {
-            var jwtToken = _httpContext.HttpContext.Request.Cookies[JWTHelper.SecretTokenName];
-            UserResponse userDataFromCookie;
-
-            if (string.IsNullOrEmpty(jwtToken))
-            {
-                throw new UnauthorizedAccessException("JWT token is missing.");
-            }
-
             DynamicParameters pars = new DynamicParameters();
+            pars.Add("@Id", id, DbType.Int32, ParameterDirection.Input);
+            pars.Add("@Email", email, DbType.String, ParameterDirection.Input);
 
-            try
-            {
-                userDataFromCookie = JWTHelper.DeconstructJWT(jwtToken);
-                pars.Add("@Id", userDataFromCookie.Id, DbType.Int32, ParameterDirection.Input);
-                pars.Add("@Email", userDataFromCookie.Email, DbType.String, ParameterDirection.Input);
-
-            }
-            catch (Exception ex)
-            {
-                throw new UnauthorizedAccessException("Error processing JWT token.", ex);
-            }
-
-            //Send data to db to verify
-
-            var result = await _connection.ExecuteScalarAsync<bool>("spCookieLoginVerification", pars, commandType: CommandType.StoredProcedure);
-
-            if (result == true)
-            {
-                var sql = " SELECT * FROM dbo.[User] WHERE Email = @Email AND Id = @Id;";
-                userDataFromCookie = await _connection.QuerySingleAsync<UserResponse>(sql, pars);
-                return userDataFromCookie;
-            }
-            else throw new UnauthorizedAccessException("Something went wrong with cookie verification, please login again.");
-
-            //var userDataFromDB = await _connection.
-
-
+            var result = await _connection.QuerySingleAsync<UserResponse>("spCookieLoginVerification", pars, commandType: CommandType.StoredProcedure);
+            return result;
         }
 
         public async Task<HealthAssesmentResponse> CreateNewHealthAssesment(int userId)
@@ -272,7 +164,6 @@ namespace MajaMayo.API.Repository
 
         public Task<bool> LogoutUser()
         {
-            _httpContext.HttpContext.Response.Cookies.Append(JWTHelper.SecretTokenName, "", JWTHelper.LogoutOptions);
             return Task.FromResult(true);
         }
 
@@ -289,19 +180,19 @@ namespace MajaMayo.API.Repository
         public async Task<bool> UpdateUserData(UserResponse user)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("@Id", user.Id);
-            parameters.Add("@FirstName", user.FirstName);
-            parameters.Add("@LastName", user.LastName);
+            parameters.Add("@Id", user.Id, DbType.Int32);
+            parameters.Add("@FirstName", user.FirstName, DbType.String);
+            parameters.Add("@LastName", user.LastName, DbType.String);
             //parameters.Add("@Email", user.Email);
             //parameters.Add("@PhoneNumber", user.PhoneNumber);
-            parameters.Add("@DateOfBirth", user.DateOfBirth);
-            parameters.Add("@Gender", user.Gender);
+            parameters.Add("@DateOfBirth", user.DateOfBirth, DbType.String);
+            parameters.Add("@Gender", user.Gender, DbType.String);
             //parameters.Add("@PolicyNumber", user.PolicyNumber);
             //parameters.Add("@JMBG", user.JMBG);
             //parameters.Add("@PassportNumber", user.PassportNumber);
-            parameters.Add("@Height", user.Height);
-            parameters.Add("@Weight", user.Weight);
-            parameters.Add("@HealthAssesmentId", user.HealthAssessmentId);
+            parameters.Add("@Height", user.Height, DbType.Int32);
+            parameters.Add("@Weight", user.Weight, DbType.Int32);
+            parameters.Add("@HealthAssesmentId", user.HealthAssessmentId, DbType.Int32);
 
             var result = await _connection.ExecuteAsync("dbo.spFormUser", parameters, commandType: CommandType.StoredProcedure);
 

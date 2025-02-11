@@ -14,6 +14,10 @@ namespace MajaMayo.API.Features.Survey.Command.User
         public async Task<bool> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
             var result = await _repository.UpdateUserData(request);
+            if (!result)
+            {
+                throw new InvalidOperationException("Failed to update user data in the database.");
+            }
             return result;
         }
     }
