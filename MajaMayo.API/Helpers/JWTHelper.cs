@@ -55,6 +55,11 @@ namespace MajaMayo.API.Helpers
 
         public static UserResponse DeconstructJWT(string jwtToken)
         {
+            if (string.IsNullOrWhiteSpace(jwtToken))
+            {
+                throw new ArgumentException("JWT token cannot be null or empty.", nameof(jwtToken));
+            }
+
             var handler = new JwtSecurityTokenHandler();
             var jwtSecurityToken = handler.ReadJwtToken(jwtToken);
 
@@ -70,7 +75,12 @@ namespace MajaMayo.API.Helpers
             {
                 throw new UnauthorizedAccessException("Invalid JWT token.");
             }
-            
+
+            if (!int.TryParse(id, out int userId))
+            {
+                throw new UnauthorizedAccessException("Invalid user ID in JWT.");
+            }
+
             return new UserResponse
             {
                 Id = int.Parse(id),

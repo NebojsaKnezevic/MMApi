@@ -167,12 +167,12 @@ namespace MajaMayo.API.Controllers
         public async Task<IActionResult> CompleteSurvey(int id) 
         {
             var result = await _sender.Send(new CompleteSurveyCommand() { haid = id });
-            if (result == true)
-            {
-                // Redirect to a different controller action
-                var dgResult = await _sender.Send(new HandleDGRequestsCommand(id));
-                return Ok(dgResult);
-            }
+            //if (result == true)
+            //{
+            //    // Redirect to a different controller action
+            //    var dgResult = await _sender.Send(new HandleDGRequestsCommand(id));
+            //    return Ok(dgResult);
+            //}
             return Ok(result);
         }
         [HttpGet("Query/GetHealthExaminations")]
