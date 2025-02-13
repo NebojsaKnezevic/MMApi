@@ -4,13 +4,16 @@ using MajaMayo.API.Middlewares;
 using MajaMayo.API.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
-
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+using MajaMayo.API.Errors;
 var   builder = WebApplication.CreateBuilder(args);
 
 //var logger = new LoggerConfiguration()
@@ -122,13 +125,37 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = false,
         ClockSkew = TimeSpan.FromMinutes(5)
     };
-})
-.AddGoogle(googleOptions =>
+});
+//.AddGoogle(googleOptions =>
+//{
+//    googleOptions.ClientId =  builder.Configuration["Authentication:Google:ClientId"];
+//    googleOptions.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET") ?? builder.Configuration["Authentication:Google:ClientSecret"];
+//})
+
+builder.Services.AddRateLimiter(options =>
 {
-    googleOptions.ClientId =  builder.Configuration["Authentication:Google:ClientId"];
-    googleOptions.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET") ?? builder.Configuration["Authentication:Google:ClientSecret"];
-})
-; 
+    options.AddFixedWindowLimiter("strict", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 5;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 0;
+    });
+
+    options.AddFixedWindowLimiter("veryStrict", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 3;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 0;
+    });
+
+    options.OnRejected = (context, token) =>
+    {
+        throw new RateLimitExceededException();
+    };
+});
+
 
 
 
@@ -156,6 +183,7 @@ app.UseSwaggerUI();
 app.UseMiddleware<ApiResponseMiddleware>();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 app.UseMiddleware<ApiKeyMiddleware>();
+app.UseRateLimiter(); // Aktivira rate limiter
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseMiddleware<CookieMiddleware>();
