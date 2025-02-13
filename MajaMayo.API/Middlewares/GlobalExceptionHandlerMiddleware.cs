@@ -1,4 +1,5 @@
 ﻿using MajaMayo.API.Constants;
+using MajaMayo.API.Errors;
 using MajaMayo.API.Helpers;
 using MajaMayo.API.Models;
 using MajaMayo.API.Repository;
@@ -54,8 +55,20 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
     {
         
 
+
         if (!context.Response.HasStarted)
         {
+            //Ispravka cors-a response-a koji dolazi od ratelimiter-a. 
+            if (!context.Response.Headers.ContainsKey("Access-Control-Allow-Origin"))
+            {
+                context.Response.Headers.Add("Access-Control-Allow-Origin", "https://api.actrs.rs");
+            }
+            //Ispravka cors-a response-a koji dolazi od ratelimiter-a. 
+            if (!context.Response.Headers.ContainsKey("Access-Control-Allow-Credentials"))
+            {
+                context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+            }
+
             context.Response.ContentType = "application/json";
 
             var jwtToken = context.Request.Cookies[JWTHelper.SecretTokenName];
@@ -116,6 +129,9 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
 
             case TimeoutException _:
                 return (int)HttpStatusCode.RequestTimeout;
+
+            case RateLimitExceededException _:
+                return (int)HttpStatusCode.TooManyRequests;
 
             case Exception _:
                 return (int)HttpStatusCode.InternalServerError;

@@ -13,7 +13,7 @@ using MajaMayo.API.Features.Survey.Command.User;
 using MajaMayo.API.Features.Survey.Query.Answer;
 using MajaMayo.API.Features.Survey.Query.Question;
 using MajaMayo.API.Features.Survey.Query.QuestionGroup;
-using MajaMayo.API.Features.DeltaGenerali.Command;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace MajaMayo.API.Controllers
 {
@@ -80,6 +80,7 @@ namespace MajaMayo.API.Controllers
         }
 
         [HttpPost("Command/LoginUser")]
+        [EnableRateLimiting("strict")]
         public async Task<IActionResult> LoginUser([FromBody] LoginUserCommand loginUserQuery)
         {
             var result = await _sender.Send(loginUserQuery);
