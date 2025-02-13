@@ -58,10 +58,17 @@ public sealed class GlobalExceptionHandlerMiddleware : IMiddleware
 
         if (!context.Response.HasStarted)
         {
+            var origin = context.Request.Headers["Origin"];
             //Ispravka cors-a response-a koji dolazi od ratelimiter-a. 
             if (!context.Response.Headers.ContainsKey("Access-Control-Allow-Origin"))
             {
-                context.Response.Headers.Add("Access-Control-Allow-Origin", "https://api.actrs.rs");
+                if (origin == "http://localhost:3000" || origin == "https://act.actrs.rs" || origin == "https://www.act.actrs.rs")
+                {
+                    context.Response.Headers.Add("Access-Control-Allow-Origin", origin);
+                }
+                //context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
+                //context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000 , https://act.actrs.rs");
+
             }
             //Ispravka cors-a response-a koji dolazi od ratelimiter-a. 
             if (!context.Response.Headers.ContainsKey("Access-Control-Allow-Credentials"))
